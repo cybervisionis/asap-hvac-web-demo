@@ -76,15 +76,15 @@
                         <p>Licensed & Insured<br>TACLA##### (Placeholder)<br>Greater Houston Area</p>
                     </div>
                     <div style="text-align: right;">
-                        <p><strong>Invoice #:</strong> INV-2025-001</p>
-                        <p><strong>Date:</strong> <span id="invoice-date"></span></p>
-                        <p><strong>Due:</strong> Upon Receipt</p>
+                        <p><strong>Invoice #:</strong> <span id="invoice-number">—</span></p>
+                        <p><strong>Date:</strong> <span id="invoice-date">—</span></p>
+                        <p><strong>Due:</strong> <span id="invoice-due">Upon Receipt</span></p>
                     </div>
                 </div>
 
                 <div style="margin-bottom: 2rem;">
                     <h3>Bill To:</h3>
-                    <p>Jane Smith<br>123 Main St, Houston, TX 77001<br>(281) 555-0123</p>
+                    <p id="bill-to">Loading…</p>
                 </div>
 
                 <table style="width: 100%; margin-bottom: 2rem; border-collapse: collapse;">
@@ -94,42 +94,27 @@
                             <th style="text-align: right; padding: 0.75rem;">Amount</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td style="padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">Diagnostic Service Call</td>
-                            <td style="text-align: right; padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">$109.00</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">Compressor Replacement</td>
-                            <td style="text-align: right; padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">$2,400.00</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">Refrigerant Recharge (R-410A)</td>
-                            <td style="text-align: right; padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">$350.00</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">Labor</td>
-                            <td style="text-align: right; padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">$141.00</td>
-                        </tr>
+                    <tbody id="invoice-line-items"></tbody>
+                    <tfoot>
                         <tr style="font-size: 1.25rem; font-weight: 700; color: var(--primary);">
                             <td style="padding: 0.75rem; border-top: 2px solid var(--primary);">Total Due:</td>
-                            <td style="text-align: right; padding: 0.75rem; border-top: 2px solid var(--primary);">$3,000.00</td>
+                            <td id="total-due" style="text-align: right; padding: 0.75rem; border-top: 2px solid var(--primary);">—</td>
                         </tr>
-                    </tbody>
+                    </tfoot>
                 </table>
 
                 <div id="payment-section">
                     <h3>Select Payment Method</h3>
-                    <div class="payment-methods">
-                        <div class="payment-method" onclick="selectPayment('card')">
+                    <div class="payment-methods" id="payment-methods">
+                        <div class="payment-method" data-method="card">
                             <h4>💳 Card</h4>
                             <p style="font-size: 0.9rem;">Credit/Debit</p>
                         </div>
-                        <div class="payment-method" onclick="selectPayment('ach')">
+                        <div class="payment-method" data-method="ach">
                             <h4>🏦 ACH</h4>
                             <p style="font-size: 0.9rem;">Bank Transfer</p>
                         </div>
-                        <div class="payment-method" onclick="selectPayment('cash')">
+                        <div class="payment-method" data-method="cash">
                             <h4>💵 Cash/Check</h4>
                             <p style="font-size: 0.9rem;">Pay on site</p>
                         </div>
@@ -140,7 +125,7 @@
                 <div id="receipt" class="hidden">
                     <div class="alert alert-success">
                         <h3>✅ Payment Successful!</h3>
-                        <p>Your payment of <strong>$3,000.00</strong> has been processed.</p>
+                        <p>Your payment of <strong id="receipt-amount">$0.00</strong> has been processed via <span id="receipt-method"></span>.</p>
                         <p><strong>Confirmation #:</strong> PAY-<span id="confirm-code"></span></p>
                         <p style="margin-top: 1rem;">A receipt has been sent to your email.</p>
                     </div>
@@ -160,29 +145,102 @@
         </div>
     </footer>
 
+    <script src="js/app.js"></script>
     <script>
-        document.getElementById('invoice-date').textContent = new Date().toLocaleDateString();
-        
+        const params = new URLSearchParams(window.location.search);
+        const formatCurrency = (value) => `$${Number(value || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
         let selectedMethod = null;
+        let currentInvoice = null;
+        let quoteContext = null;
 
-        function selectPayment(method) {
+        async function initInvoicePage() {
+            await loadData();
+            const requestedInvoice = params.get('invoice');
+            const fallback = (appData.invoices || [])[0]?.id;
+            const invoiceId = requestedInvoice || fallback;
+            currentInvoice = dashboardHelpers.getInvoiceById(invoiceId);
+            if (!currentInvoice) {
+                document.querySelector('.invoice-container').innerHTML = '<div class="alert alert-warning">Invoice not found. Return to <a href="admin/dashboard.html">dashboard</a>.</div>';
+                return;
+            }
+            quoteContext = dashboardHelpers.getQuoteContext(currentInvoice.finalQuoteId);
+            hydrateInvoiceDetails();
+            wirePaymentHandlers();
+        }
+
+        function hydrateInvoiceDetails() {
+            const { invoice } = getInvoiceBundle();
+            document.getElementById('invoice-number').textContent = invoice.id.toUpperCase();
+            document.getElementById('invoice-date').textContent = new Date(invoice.createdOn || Date.now()).toLocaleDateString();
+            document.getElementById('invoice-due').textContent = new Date(invoice.dueDate || Date.now()).toLocaleDateString();
+
+            const request = quoteContext?.quoteRequest;
+            document.getElementById('bill-to').innerHTML = request ? `${request.customerName}<br>${request.address}<br>${request.contactPhone}` : 'Customer details syncing...';
+
+            const lineItems = buildInvoiceLines();
+            const tbody = document.getElementById('invoice-line-items');
+            tbody.innerHTML = lineItems.map(item => `
+                <tr>
+                    <td style="padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">${item.label}</td>
+                    <td style="text-align: right; padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">${formatCurrency(item.amount)}</td>
+                </tr>`).join('');
+            document.getElementById('total-due').textContent = formatCurrency(invoice.amountDue);
+        }
+
+        function buildInvoiceLines() {
+            const { finalQuote, inspection } = quoteContext || {};
+            const items = [{ label: 'Project Estimate', amount: finalQuote?.baseEstimate || currentInvoice.amountDue }];
+            (inspection?.adjustments || []).forEach(adjustment => {
+                items.push({ label: adjustment.description, amount: adjustment.cost });
+            });
+            const subtotal = items.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+            if (subtotal < currentInvoice.amountDue) {
+                items.push({ label: 'Labor & Materials', amount: currentInvoice.amountDue - subtotal });
+            }
+            return items;
+        }
+
+        function wirePaymentHandlers() {
+            document.querySelectorAll('.payment-method').forEach(el => {
+                el.addEventListener('click', () => selectPayment(el.dataset.method, el));
+            });
+            document.getElementById('pay-btn').addEventListener('click', processPayment);
+        }
+
+        function selectPayment(method, element) {
             selectedMethod = method;
             document.querySelectorAll('.payment-method').forEach(el => el.classList.remove('selected'));
-            event.target.closest('.payment-method').classList.add('selected');
+            element.classList.add('selected');
             document.getElementById('pay-btn').disabled = false;
         }
 
         function processPayment() {
             if (!selectedMethod) return;
-            
+            const amount = formatCurrency(currentInvoice.amountDue);
+            document.getElementById('receipt-amount').textContent = amount;
+            document.getElementById('receipt-method').textContent = selectedMethod.toUpperCase();
             document.getElementById('payment-section').style.display = 'none';
             document.getElementById('receipt').classList.remove('hidden');
             document.getElementById('confirm-code').textContent = Date.now().toString().slice(-8);
+
+            if (quoteContext?.quoteRequest) {
+                const customerName = quoteContext.quoteRequest.customerName;
+                dashboardHelpers.updateInvoiceStatus(currentInvoice.id, 'paid', { customerName });
+                dashboardHelpers.updateQuoteStage(quoteContext.finalQuote.id, 'paid', { customerName, label: `${customerName} completed payment (${selectedMethod})` });
+            } else {
+                dashboardHelpers.updateInvoiceStatus(currentInvoice.id, 'paid', {});
+            }
         }
 
         function downloadPDF() {
-            alert('In a production system, this would generate and download a PDF receipt.');
+            alert(`In production, this would download ${currentInvoice?.id || 'your invoice'} as a PDF.`);
         }
+
+        function getInvoiceBundle() {
+            return { invoice: currentInvoice, quoteContext };
+        }
+
+        document.addEventListener('DOMContentLoaded', initInvoicePage);
     </script>
 </body>
 </html>

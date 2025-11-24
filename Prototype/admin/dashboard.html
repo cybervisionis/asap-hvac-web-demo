@@ -6,38 +6,134 @@
     <title>Admin Dashboard - ASAP HVAC</title>
     <link rel="stylesheet" href="../css/styles.css">
     <style>
+        .dashboard-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .summary-card {
+            background: linear-gradient(135deg, #0f172a, #1d4ed8);
+            color: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.35);
+        }
+        .summary-card .label {
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            opacity: 0.8;
+            margin-bottom: 0.35rem;
+        }
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        .metric-meta {
+            font-size: 0.85rem;
+            opacity: 0.85;
+        }
         .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+            gap: 1.75rem;
         }
         .dashboard-card {
-            background: white;
-            border-radius: 8px;
+            background: #fff;
+            border-radius: 12px;
             padding: 1.5rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.07);
+            display: flex;
+            flex-direction: column;
         }
         .dashboard-card h2 {
-            margin-bottom: 1rem;
+            margin: 0 0 1rem;
             font-size: 1.25rem;
-            color: var(--primary);
+            color: var(--primary-dark, #0f172a);
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
         }
         .status-badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 12px;
-            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            padding: 0.2rem 0.85rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
             font-weight: 600;
-            margin-right: 0.5rem;
+            letter-spacing: 0.01em;
         }
-        .status-requested { background: #FFF4E5; color: #D97706; }
-        .status-scheduled { background: #DBEAFE; color: #2563EB; }
-        .status-completed { background: #D1FAE5; color: #059669; }
-        .status-paid { background: #D1FAE5; color: #059669; }
-        .status-outstanding { background: #FEE2E2; color: #DC2626; }
+        .status-requested { background: #FFF4E5; color: #B45309; }
+        .status-scheduled { background: #EEF2FF; color: #4338CA; }
+        .status-completed { background: #DCFCE7; color: #0F7A3A; }
+        .status-paid { background: #D1FAE5; color: #047857; }
+        .status-outstanding { background: #FEE2E2; color: #B91C1C; }
+        .status-approved { background: #DBEAFE; color: #1D4ED8; }
+        .status-invoiced { background: #FEF3C7; color: #B45309; }
+        .status-revision { background: #FDE68A; color: #92400E; }
+        .table-wrapper { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        table th { text-align: left; padding: 0.5rem; border-bottom: 2px solid var(--neutral-light); }
-        table td { padding: 0.5rem; border-bottom: 1px solid var(--neutral-light); }
+        table th { text-align: left; padding: 0.5rem 0.25rem; border-bottom: 2px solid var(--neutral-light); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; color: #4b5563; }
+        table td { padding: 0.65rem 0.25rem; border-bottom: 1px solid var(--neutral-light); vertical-align: top; }
+        .table-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+        .action-pill {
+            border: 1px solid var(--primary, #1d4ed8);
+            background: transparent;
+            color: var(--primary, #1d4ed8);
+            padding: 0.2rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .action-pill:hover { background: var(--primary, #1d4ed8); color: white; }
+        .action-pill.is-danger { border-color: #b91c1c; color: #b91c1c; }
+        .action-pill.is-danger:hover { background: #b91c1c; color: white; }
+        .action-pill.is-muted { border-color: #94a3b8; color: #475569; }
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .timeline-entry {
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+        }
+        .timeline-entry::before {
+            content: '';
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--primary, #1d4ed8);
+            margin-top: 0.45rem;
+            flex-shrink: 0;
+        }
+        .timeline-entry p {
+            margin: 0;
+            color: #1f2937;
+        }
+        .timeline-entry span {
+            display: block;
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+        .empty-state {
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            color: #475569;
+            font-size: 0.9rem;
+        }
+        @media (max-width: 768px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -60,31 +156,78 @@
     <section class="section">
         <div class="container">
             <h1>Admin Dashboard <span class="demo-badge">DEMO</span></h1>
-            <p style="margin-bottom: 2rem;">Manage quote requests, inspections, appointments, and invoices.</p>
-            
+            <p style="margin-bottom: 2rem;">Live demo of the internal workflow from quote intake through inspection, invoicing, and maintenance memberships.</p>
+
+            <div class="dashboard-summary">
+                <div class="summary-card" data-summary="quotes">
+                    <p class="label">Open Quotes</p>
+                    <div class="metric-value">0</div>
+                    <div class="metric-meta">Awaiting homeowner approval</div>
+                </div>
+                <div class="summary-card" data-summary="inspections">
+                    <p class="label">Visits Today</p>
+                    <div class="metric-value">0</div>
+                    <div class="metric-meta">Scheduled & confirmed windows</div>
+                </div>
+                <div class="summary-card" data-summary="invoices">
+                    <p class="label">Invoices Due</p>
+                    <div class="metric-value">0</div>
+                    <div class="metric-meta">Outstanding balance next 7 days</div>
+                </div>
+                <div class="summary-card" data-summary="members">
+                    <p class="label">Plan Members</p>
+                    <div class="metric-value">0</div>
+                    <div class="metric-meta">Active Comfort Club households</div>
+                </div>
+            </div>
+
             <div class="dashboard-grid">
-                <!-- Quote Requests -->
-                <div class="dashboard-card">
-                    <h2>Recent Quote Requests</h2>
-                    <div id="quote-requests-list"></div>
+                <div class="dashboard-card" id="quotes-card">
+                    <div class="card-header">
+                        <h2>Quote Pipeline</h2>
+                        <span class="status-badge status-requested" id="quotes-header-badge">Loading...</span>
+                    </div>
+                    <div class="table-wrapper" id="quote-requests-list"></div>
                 </div>
 
-                <!-- Scheduled Appointments -->
-                <div class="dashboard-card">
-                    <h2>Upcoming Appointments</h2>
-                    <div id="appointments-list"></div>
+                <div class="dashboard-card" id="visits-card">
+                    <div class="card-header">
+                        <h2>Appointments & Dispatch</h2>
+                        <span class="status-badge status-scheduled" id="appointments-header-badge">Syncing...</span>
+                    </div>
+                    <div class="table-wrapper" id="appointments-list"></div>
                 </div>
 
-                <!-- Invoices -->
-                <div class="dashboard-card">
-                    <h2>Recent Invoices</h2>
-                    <div id="invoices-list"></div>
+                <div class="dashboard-card" id="inspections-card">
+                    <div class="card-header">
+                        <h2>Inspection Findings</h2>
+                        <span class="status-badge status-completed" id="inspections-header-badge">Syncing...</span>
+                    </div>
+                    <div class="table-wrapper" id="inspections-list"></div>
                 </div>
 
-                <!-- Maintenance Plans -->
-                <div class="dashboard-card">
-                    <h2>Active Maintenance Members</h2>
-                    <div id="members-list"></div>
+                <div class="dashboard-card" id="invoices-card">
+                    <div class="card-header">
+                        <h2>Invoices & Cash Flow</h2>
+                        <span class="status-badge status-outstanding" id="invoices-header-badge">Syncing...</span>
+                    </div>
+                    <div class="table-wrapper" id="invoices-list"></div>
+                </div>
+
+                <div class="dashboard-card" id="members-card">
+                    <div class="card-header">
+                        <h2>Maintenance Memberships</h2>
+                        <span class="status-badge status-completed" id="members-header-badge">Syncing...</span>
+                    </div>
+                    <div class="table-wrapper" id="members-list"></div>
+                </div>
+
+                <div class="dashboard-card" id="timeline-card">
+                    <div class="card-header">
+                        <h2>Ops Timeline</h2>
+                        <span class="status-badge status-scheduled" id="timeline-header-badge">Last synced just now</span>
+                    </div>
+                    <div class="timeline" id="timeline-feed"></div>
                 </div>
             </div>
         </div>
@@ -98,90 +241,311 @@
 
     <script src="../js/app.js"></script>
     <script>
-        loadData().then(() => {
-            // Quote Requests
-            const quotesList = document.getElementById('quote-requests-list');
+        const actionLabels = {
+            'awaiting-approval': 'Awaiting Approval',
+            'approved': 'Approved',
+            'needs-revision': 'Needs Revision',
+            'quote-sent': 'Quote Sent',
+            'inspection-complete': 'Inspection Complete',
+            'invoiced': 'Invoice Sent',
+            'sent': 'Invoice Sent',
+            'paid': 'Paid',
+            'draft': 'Draft',
+            'scheduled': 'Scheduled',
+            'completed': 'Completed'
+        };
+
+        const statusClassMap = {
+            'awaiting-approval': 'status-requested',
+            'quote-sent': 'status-requested',
+            'approved': 'status-approved',
+            'needs-revision': 'status-revision',
+            'inspection-complete': 'status-completed',
+            'scheduled': 'status-scheduled',
+            'completed': 'status-completed',
+            'invoiced': 'status-invoiced',
+            'sent': 'status-invoiced',
+            'paid': 'status-paid',
+            'outstanding': 'status-outstanding'
+        };
+
+        const timelineSeedKey = 'asapPipelineTimelineSeeded';
+
+        const formatCurrency = (value) => `$${Number(value || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+        const formatDate = (value) => value ? new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '-';
+
+        function seedTimelineHistory() {
+            if (localStorage.getItem(timelineSeedKey)) return;
+            const seeds = [
+                { label: 'Inspection report uploaded for Jane Smith', type: 'inspection', stage: 'inspection-complete', customer: 'Jane Smith', timestamp: '2025-11-24T15:25:00Z' },
+                { label: 'Invoice INV-3002 paid online by Michael Lee', type: 'invoice', stage: 'paid', customer: 'Michael Lee', timestamp: '2025-11-24T18:42:00Z' },
+                { label: 'New quote request submitted by Sophia Patel', type: 'quote', stage: 'awaiting-approval', customer: 'Sophia Patel', timestamp: '2025-11-25T09:10:00Z' }
+            ];
+            seeds.forEach(entry => dashboardHelpers.recordPipelineHistory(entry));
+            localStorage.setItem(timelineSeedKey, 'true');
+        }
+
+        function buildQuoteModels() {
             const storedQuotes = getQuoteRequests();
-            const allQuotes = [...appData.quoteRequests, ...storedQuotes];
-            
-            if (allQuotes.length === 0) {
-                quotesList.innerHTML = '<p style="color: var(--neutral-dark);">No quote requests yet. <a href="../quote.html">Create one</a></p>';
-            } else {
-                let quotesHtml = '<table><tr><th>Customer</th><th>Service</th><th>Status</th><th>Date</th></tr>';
-                allQuotes.forEach(q => {
-                    quotesHtml += 
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td><span class="status-badge status-"></span></td>
-                            <td></td>
-                        </tr>
-                    ;
-                });
-                quotesHtml += '</table>';
-                quotesList.innerHTML = quotesHtml;
-            }
+            const manualQuotes = storedQuotes.map(q => ({
+                quoteRequest: q,
+                finalQuote: null,
+                stage: q.status || 'awaiting-approval'
+            }));
+            const quotes = (appData.finalQuotes || []).map(fq => {
+                const quoteRequest = dashboardHelpers.getQuoteRequestById(fq.quoteRequestId);
+                const invoice = (appData.invoices || []).find(inv => inv.finalQuoteId === fq.id) || null;
+                const appointment = dashboardHelpers.getAppointmentByQuoteId(fq.quoteRequestId);
+                const stage = dashboardHelpers.getQuoteStage(fq.id, fq.status);
+                return {
+                    id: fq.id,
+                    finalQuote: fq,
+                    quoteRequest,
+                    invoice,
+                    appointment,
+                    customerName: quoteRequest?.customerName || 'Unknown',
+                    serviceType: quoteRequest?.serviceType || 'General',
+                    expiresOn: fq.expiresOn,
+                    total: fq.finalTotal,
+                    stage,
+                    stageClass: statusClassMap[stage] || 'status-requested',
+                    stageLabel: actionLabels[stage] || stage
+                };
+            });
+            return [...quotes, ...manualQuotes].sort((a, b) => {
+                const aDate = a.expiresOn ? new Date(a.expiresOn) : new Date();
+                const bDate = b.expiresOn ? new Date(b.expiresOn) : new Date();
+                return aDate - bDate;
+            });
+        }
 
-            // Appointments
-            const appointmentsList = document.getElementById('appointments-list');
-            if (appData.appointments.length === 0) {
-                appointmentsList.innerHTML = '<p style="color: var(--neutral-dark);">No scheduled appointments.</p>';
-            } else {
-                let apptHtml = '<table><tr><th>Customer</th><th>Date</th><th>Window</th><th>Status</th></tr>';
-                appData.appointments.forEach(a => {
-                    apptHtml += 
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td><span class="status-badge status-"></span></td>
-                        </tr>
-                    ;
-                });
-                apptHtml += '</table>';
-                appointmentsList.innerHTML = apptHtml;
+        function renderQuotesTable(quotes) {
+            const container = document.getElementById('quote-requests-list');
+            if (!quotes.length) {
+                container.innerHTML = '<div class="empty-state">No quote activity yet. Drive traffic from landing pages to kick off the workflow.</div>';
+                document.getElementById('quotes-header-badge').textContent = 'No quotes in queue';
+                return;
             }
+            document.getElementById('quotes-header-badge').textContent = `${quotes.filter(q => ['awaiting-approval','quote-sent','needs-revision'].includes(q.stage)).length} open approvals`;
+            let html = '<table><thead><tr><th>Customer</th><th>Service</th><th>Value</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+            quotes.forEach(model => {
+                const badge = `<span class="status-badge ${model.stageClass}">${model.stageLabel}</span>`;
+                const actions = [];
+                if (!model.finalQuote) {
+                    actions.push(`<span class="action-pill is-muted" data-action="collect-details" data-name="${model.quoteRequest?.customerName || ''}">Collect Details</span>`);
+                } else {
+                    if (['awaiting-approval', 'quote-sent'].includes(model.stage)) {
+                        actions.push(`<button class="action-pill" data-action="approve-quote" data-quote-id="${model.id}">Mark Approved</button>`);
+                        actions.push(`<button class="action-pill is-danger" data-action="request-revision" data-quote-id="${model.id}">Needs Revision</button>`);
+                    }
+                    if (model.stage === 'approved' && model.invoice) {
+                        actions.push(`<button class="action-pill" data-action="send-invoice" data-quote-id="${model.id}" data-invoice-id="${model.invoice.id}">Send Invoice</button>`);
+                    }
+                    if ((model.stage === 'invoiced' || model.stage === 'approved') && model.invoice) {
+                        actions.push(`<button class="action-pill" data-action="open-invoice" data-invoice-id="${model.invoice.id}">Invoice Preview</button>`);
+                    }
+                    if (model.stage === 'invoiced' && model.invoice) {
+                        actions.push(`<button class="action-pill" data-action="mark-paid" data-invoice-id="${model.invoice.id}" data-quote-id="${model.id}">Mark Paid</button>`);
+                    }
+                    actions.push(`<a class="action-pill" href="../quote-view.html?quote=${model.id}">Open Quote</a>`);
+                }
+                html += `<tr>
+                    <td><strong>${model.customerName}</strong><br><small>${model.quoteRequest?.address || ''}</small></td>
+                    <td>${model.serviceType}</td>
+                    <td>${model.finalQuote ? formatCurrency(model.total) : '-'}</td>
+                    <td>${badge}<div style="font-size:0.75rem;color:#6b7280;">Exp ${formatDate(model.expiresOn)}</div></td>
+                    <td><div class="table-actions">${actions.join('')}</div></td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
 
-            // Invoices
-            const invoicesList = document.getElementById('invoices-list');
-            if (appData.invoices.length === 0) {
-                invoicesList.innerHTML = '<p style="color: var(--neutral-dark);">No invoices yet.</p>';
-            } else {
-                let invHtml = '<table><tr><th>Customer</th><th>Amount</th><th>Status</th><th>Date</th></tr>';
-                appData.invoices.forEach(inv => {
-                    invHtml += 
-                        <tr>
-                            <td></td>
-                            <td>$</td>
-                            <td><span class="status-badge status-"></span></td>
-                            <td></td>
-                        </tr>
-                    ;
-                });
-                invHtml += '</table>';
-                invoicesList.innerHTML = invHtml;
+        function renderAppointmentsTable() {
+            const container = document.getElementById('appointments-list');
+            const appointments = appData.appointments || [];
+            if (!appointments.length) {
+                container.innerHTML = '<div class="empty-state">No upcoming visits scheduled.</div>';
+                document.getElementById('appointments-header-badge').textContent = 'Dispatch clear';
+                return;
             }
+            document.getElementById('appointments-header-badge').textContent = `${appointments.filter(a => a.status === 'scheduled').length} ready to dispatch`;
+            let html = '<table><thead><tr><th>Customer</th><th>Date</th><th>Window</th><th>Tech</th><th>Status</th></tr></thead><tbody>';
+            appointments.forEach(appt => {
+                const quote = dashboardHelpers.getQuoteRequestById(appt.quoteRequestId);
+                const badgeClass = statusClassMap[appt.status] || 'status-scheduled';
+                html += `<tr>
+                    <td>${quote?.customerName || appt.quoteRequestId}</td>
+                    <td>${formatDate(appt.scheduledDate)}</td>
+                    <td>${appt.window}</td>
+                    <td>${appt.technician}</td>
+                    <td><span class="status-badge ${badgeClass}">${actionLabels[appt.status] || appt.status}</span></td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
 
-            // Maintenance Members
-            const membersList = document.getElementById('members-list');
-            const activeMembers = appData.customers.filter(c => c.maintenancePlanId);
-            if (activeMembers.length === 0) {
-                membersList.innerHTML = '<p style="color: var(--neutral-dark);">No active maintenance members.</p>';
-            } else {
-                let membersHtml = '<table><tr><th>Customer</th><th>Plan</th><th>Enrolled</th></tr>';
-                activeMembers.forEach(m => {
-                    const plan = appData.maintenancePlans.find(p => p.id === m.maintenancePlanId);
-                    membersHtml += 
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    ;
-                });
-                membersHtml += '</table>';
-                membersList.innerHTML = membersHtml;
+        function renderInspectionsTable() {
+            const container = document.getElementById('inspections-list');
+            const inspections = appData.inspections || [];
+            if (!inspections.length) {
+                container.innerHTML = '<div class="empty-state">No inspection notes on file.</div>';
+                document.getElementById('inspections-header-badge').textContent = 'Awaiting reports';
+                return;
             }
+            document.getElementById('inspections-header-badge').textContent = `${inspections.length} latest reports`;
+            let html = '<table><thead><tr><th>Customer</th><th>Technician</th><th>Findings</th><th>Recommendations</th></tr></thead><tbody>';
+            inspections.forEach(item => {
+                const quote = dashboardHelpers.getQuoteRequestById(item.quoteRequestId);
+                const findings = item.findings?.map(f => `<span class="status-badge status-outstanding" style="margin-right:0.25rem;">${f.code}</span>`).join('') || '—';
+                html += `<tr>
+                    <td>${quote?.customerName || item.quoteRequestId}</td>
+                    <td>${item.technician}</td>
+                    <td>${findings}</td>
+                    <td>${item.recommendedServices?.join(', ') || '—'}</td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function renderInvoicesTable() {
+            const container = document.getElementById('invoices-list');
+            const invoices = appData.invoices || [];
+            if (!invoices.length) {
+                container.innerHTML = '<div class="empty-state">No invoices issued.</div>';
+                document.getElementById('invoices-header-badge').textContent = 'Nothing outstanding';
+                return;
+            }
+            const outstanding = invoices.filter(inv => !(inv.paid || dashboardHelpers.getInvoiceStage(inv.id, inv) === 'paid'));
+            document.getElementById('invoices-header-badge').textContent = `${outstanding.length} outstanding`; 
+            let html = '<table><thead><tr><th>Invoice</th><th>Customer</th><th>Amount</th><th>Status</th><th>Due</th></tr></thead><tbody>';
+            invoices.forEach(inv => {
+                const quote = (appData.finalQuotes || []).find(fq => fq.id === inv.finalQuoteId);
+                const request = dashboardHelpers.getQuoteRequestById(quote?.quoteRequestId);
+                const stage = dashboardHelpers.getInvoiceStage(inv.id, inv);
+                const badge = `<span class="status-badge ${statusClassMap[stage] || 'status-outstanding'}">${actionLabels[stage] || stage}</span>`;
+                html += `<tr>
+                    <td>${inv.id.toUpperCase()}</td>
+                    <td>${request?.customerName || '—'}</td>
+                    <td>${formatCurrency(inv.amountDue)}</td>
+                    <td>${badge}</td>
+                    <td>${formatDate(inv.dueDate)}</td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function renderMembersTable() {
+            const container = document.getElementById('members-list');
+            const members = (appData.customers || []).filter(c => c.maintenancePlanId);
+            if (!members.length) {
+                container.innerHTML = '<div class="empty-state">No active Comfort Club members yet.</div>';
+                document.getElementById('members-header-badge').textContent = '0 active';
+                return;
+            }
+            document.getElementById('members-header-badge').textContent = `${members.length} active`; 
+            let html = '<table><thead><tr><th>Customer</th><th>Plan</th><th>Enrolled</th><th>Contact</th></tr></thead><tbody>';
+            members.forEach(member => {
+                const plan = appData.maintenancePlans.find(p => p.id === member.maintenancePlanId);
+                html += `<tr>
+                    <td>${member.name}</td>
+                    <td>${plan?.name || member.planTier}</td>
+                    <td>${formatDate(member.enrolledOn)}</td>
+                    <td>${member.phone}</td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function renderTimeline() {
+            const container = document.getElementById('timeline-feed');
+            const history = dashboardHelpers.getPipelineHistory();
+            if (!history.length) {
+                container.innerHTML = '<div class="empty-state">No activity yet – interact with the cards to see the event stream light up.</div>';
+                return;
+            }
+            container.innerHTML = history.slice(0, 8).map(entry => {
+                const date = new Date(entry.timestamp).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+                return `<div class="timeline-entry">
+                    <div>
+                        <p>${entry.label}</p>
+                        <span>${date}${entry.customer ? ` · ${entry.customer}` : ''}</span>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function renderSummaryCards(quotes) {
+            const summaryMap = {
+                quotes: quotes.filter(q => ['awaiting-approval','quote-sent','needs-revision'].includes(q.stage)).length,
+                inspections: (appData.appointments || []).filter(a => a.status === 'scheduled').length,
+                invoices: (appData.invoices || []).filter(inv => !(inv.paid || dashboardHelpers.getInvoiceStage(inv.id, inv) === 'paid')).length,
+                members: (appData.customers || []).filter(c => c.maintenancePlanId).length
+            };
+            Object.entries(summaryMap).forEach(([key, value]) => {
+                const card = document.querySelector(`[data-summary="${key}"] .metric-value`);
+                if (card) card.textContent = value;
+            });
+        }
+
+        function handleAction(event) {
+            const target = event.target.closest('[data-action]');
+            if (!target) return;
+            const action = target.dataset.action;
+            const quoteId = target.dataset.quoteId;
+            const invoiceId = target.dataset.invoiceId;
+            if (!action) return;
+            event.preventDefault();
+            const quote = quoteId ? dashboardHelpers.getQuoteContext(quoteId) : null;
+            const customerName = quote?.quoteRequest?.customerName;
+            switch(action) {
+                case 'approve-quote':
+                    dashboardHelpers.updateQuoteStage(quoteId, 'approved', { customerName });
+                    break;
+                case 'request-revision':
+                    dashboardHelpers.updateQuoteStage(quoteId, 'needs-revision', { customerName });
+                    break;
+                case 'send-invoice':
+                    if (invoiceId) {
+                        dashboardHelpers.updateInvoiceStatus(invoiceId, 'sent', { customerName });
+                    }
+                    dashboardHelpers.updateQuoteStage(quoteId, 'invoiced', { customerName });
+                    break;
+                case 'mark-paid':
+                    if (invoiceId) {
+                        dashboardHelpers.updateInvoiceStatus(invoiceId, 'paid', { customerName });
+                    }
+                    dashboardHelpers.updateQuoteStage(quoteId, 'paid', { customerName });
+                    break;
+                case 'open-invoice':
+                    window.location.href = `../invoice.html?invoice=${invoiceId}`;
+                    return;
+                default:
+                    console.log('Unhandled action', action);
+            }
+            renderDashboard();
+        }
+
+        function renderDashboard() {
+            const quotes = buildQuoteModels();
+            renderSummaryCards(quotes);
+            renderQuotesTable(quotes);
+            renderAppointmentsTable();
+            renderInspectionsTable();
+            renderInvoicesTable();
+            renderMembersTable();
+            renderTimeline();
+        }
+
+        document.addEventListener('click', handleAction);
+
+        loadData().then(() => {
+            seedTimelineHistory();
+            renderDashboard();
         });
     </script>
 </body>

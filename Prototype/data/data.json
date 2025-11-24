@@ -27,6 +27,34 @@
       "symptoms": ["No cooling", "High energy bill"],
       "notes": "System struggles afternoons.",
       "status": "awaiting-scheduling"
+    },
+    {
+      "id": "qr-1002",
+      "customerName": "Michael Lee",
+      "contactPhone": "713-555-0194",
+      "email": "michael.lee@example.com",
+      "address": "890 Forest Bend Dr, Houston, TX",
+      "serviceType": "maintenance",
+      "urgency": "normal",
+      "requestedDate": "2025-11-20",
+      "unitAgeYears": 4,
+      "symptoms": ["Uneven cooling"],
+      "notes": "Needs seasonal tune-up before holidays.",
+      "status": "inspection-complete"
+    },
+    {
+      "id": "qr-1003",
+      "customerName": "Sophia Patel",
+      "contactPhone": "832-555-0177",
+      "email": "sophia.patel@example.com",
+      "address": "55 Cypress Field Ln, Katy, TX",
+      "serviceType": "installation",
+      "urgency": "high",
+      "requestedDate": "2025-11-18",
+      "unitAgeYears": 14,
+      "symptoms": ["System short cycling", "Burning smell"],
+      "notes": "Wants quote on full system replacement.",
+      "status": "quote-sent"
     }
   ],
   "appointments": [
@@ -37,6 +65,22 @@
       "window": "9am-11am",
       "technician": "Anthony Anderson",
       "status": "scheduled"
+    },
+    {
+      "id": "appt-5002",
+      "quoteRequestId": "qr-1002",
+      "scheduledDate": "2025-11-22",
+      "window": "1pm-3pm",
+      "technician": "Sara Chen",
+      "status": "completed"
+    },
+    {
+      "id": "appt-5003",
+      "quoteRequestId": "qr-1003",
+      "scheduledDate": "2025-11-21",
+      "window": "8am-10am",
+      "technician": "Luis Ortega",
+      "status": "completed"
     }
   ],
   "inspections": [
@@ -53,6 +97,32 @@
         { "description": "Replace capacitor", "cost": 120.00 }
       ],
       "recommendedServices": ["Seasonal tune-up"]
+    },
+    {
+      "id": "insp-7002",
+      "quoteRequestId": "qr-1002",
+      "technician": "Sara Chen",
+      "findings": [
+        { "code": "dirty-coils", "description": "Outdoor coil heavily impacted", "severity": "moderate" }
+      ],
+      "adjustments": [
+        { "description": "Deep coil clean", "cost": 220.00 }
+      ],
+      "recommendedServices": ["Plan renewal", "Thermostat calibration"]
+    },
+    {
+      "id": "insp-7003",
+      "quoteRequestId": "qr-1003",
+      "technician": "Luis Ortega",
+      "findings": [
+        { "code": "compressor-fail", "description": "Compressor locked up", "severity": "critical" },
+        { "code": "duct-leak", "description": "Multiple duct leaks in attic", "severity": "high" }
+      ],
+      "adjustments": [
+        { "description": "Full system swap", "cost": 6400.00 },
+        { "description": "Seal ductwork", "cost": 780.00 }
+      ],
+      "recommendedServices": ["Premium install", "Duct sealing"]
     }
   ],
   "finalQuotes": [
@@ -64,6 +134,24 @@
       "finalTotal": 550.00,
       "expiresOn": "2025-12-05",
       "status": "awaiting-approval"
+    },
+    {
+      "id": "fq-9002",
+      "quoteRequestId": "qr-1002",
+      "baseEstimate": 289.00,
+      "adjustmentsTotal": 220.00,
+      "finalTotal": 509.00,
+      "expiresOn": "2025-12-02",
+      "status": "approved"
+    },
+    {
+      "id": "fq-9003",
+      "quoteRequestId": "qr-1003",
+      "baseEstimate": 6200.00,
+      "adjustmentsTotal": 980.00,
+      "finalTotal": 7180.00,
+      "expiresOn": "2025-12-08",
+      "status": "awaiting-approval"
     }
   ],
   "invoices": [
@@ -73,6 +161,24 @@
       "amountDue": 550.00,
       "createdOn": "2025-11-24",
       "dueDate": "2025-12-04",
+      "paid": false,
+      "paymentRef": null
+    },
+    {
+      "id": "inv-3002",
+      "finalQuoteId": "fq-9002",
+      "amountDue": 509.00,
+      "createdOn": "2025-11-23",
+      "dueDate": "2025-12-03",
+      "paid": true,
+      "paymentRef": "PAY-88213476"
+    },
+    {
+      "id": "inv-3003",
+      "finalQuoteId": "fq-9003",
+      "amountDue": 7180.00,
+      "createdOn": "2025-11-25",
+      "dueDate": "2025-12-10",
       "paid": false,
       "paymentRef": null
     }
@@ -90,6 +196,19 @@
       "status": "ordered",
       "etaDate": "2025-11-30",
       "notes": "Standard shipping; tech to confirm install window when received."
+    },
+    {
+      "id": "po-8002",
+      "finalQuoteId": "fq-9003",
+      "items": [
+        { "partId": "prt-05", "description": "4-ton high efficiency condenser", "qty": 1, "costEach": 3450.00 },
+        { "partId": "prt-06", "description": "Matched air handler", "qty": 1, "costEach": 1850.00 },
+        { "partId": "prt-07", "description": "Duct sealing kit", "qty": 1, "costEach": 220.00 }
+      ],
+      "totalCost": 5520.00,
+      "status": "awaiting-approval",
+      "etaDate": "2025-12-03",
+      "notes": "Vendor holds shipment until deposit received."
     }
   ],
   "customers": [
@@ -99,10 +218,31 @@
       "primaryAddress": "123 Houston Ave, Houston, TX",
       "email": "jane@example.com",
       "phone": "281-555-0110",
-      "planTier": null
+      "planTier": null,
+      "maintenancePlanId": null,
+      "enrolledOn": null
+    },
+    {
+      "id": "cust-002",
+      "name": "Michael Lee",
+      "primaryAddress": "890 Forest Bend Dr, Houston, TX",
+      "email": "michael.lee@example.com",
+      "phone": "713-555-0194",
+      "planTier": "Plus",
+      "maintenancePlanId": "plan-plus",
+      "enrolledOn": "2024-09-18"
+    },
+    {
+      "id": "cust-003",
+      "name": "Sophia Patel",
+      "primaryAddress": "55 Cypress Field Ln, Katy, TX",
+      "email": "sophia.patel@example.com",
+      "phone": "832-555-0177",
+      "planTier": "Premium",
+      "maintenancePlanId": "plan-premium",
+      "enrolledOn": "2023-04-02"
     }
-  ]
-  ,
+  ],
   "businessSettings": {
     "cancellationWindowHours": 24,
     "cancellationFee": 50.00,

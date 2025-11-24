@@ -1,6 +1,8 @@
 // ASAP HVAC Prototype App
 
 let appData = {};
+const PIPELINE_STATE_KEY = 'asapPipelineState';
+const PIPELINE_HISTORY_KEY = 'asapPipelineHistory';
 
 const serviceVisuals = {
     'svc-diagnostic': {
@@ -96,6 +98,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 window.buildServiceCardMarkup = buildServiceCardMarkup;
 window.serviceVisuals = serviceVisuals;
+window.getAppData = () => appData;
 
 // Helper to save quote request
 function saveQuoteRequest(quoteData) {
@@ -109,3 +112,135 @@ function saveQuoteRequest(quoteData) {
 function getQuoteRequests() {
     return JSON.parse(localStorage.getItem('quoteRequests') || '[]');
 }
+
+function getQuoteRequestById(id) {
+    return (appData.quoteRequests || []).find(q => q.id === id) || null;
+}
+
+function getFinalQuoteById(id) {
+    return (appData.finalQuotes || []).find(fq => fq.id === id) || null;
+}
+
+function getInvoiceById(id) {
+    return (appData.invoices || []).find(inv => inv.id === id) || null;
+}
+
+function getAppointmentByQuoteId(quoteRequestId) {
+    return (appData.appointments || []).find(a => a.quoteRequestId === quoteRequestId) || null;
+}
+
+function getInspectionByQuoteId(quoteRequestId) {
+    return (appData.inspections || []).find(i => i.quoteRequestId === quoteRequestId) || null;
+}
+
+function getCustomerByPlan(planId) {
+    if (!planId) return null;
+    return (appData.customers || []).find(c => c.maintenancePlanId === planId) || null;
+}
+
+function getCustomerFromQuote(quoteRequest) {
+    if (!quoteRequest) return null;
+    return (appData.customers || []).find(c => c.email === quoteRequest.email) || null;
+}
+
+function getQuoteContext(finalQuoteId) {
+    const finalQuote = getFinalQuoteById(finalQuoteId);
+    if (!finalQuote) return null;
+    const quoteRequest = getQuoteRequestById(finalQuote.quoteRequestId);
+    return {
+        finalQuote,
+        quoteRequest,
+        inspection: getInspectionByQuoteId(finalQuote.quoteRequestId),
+        appointment: getAppointmentByQuoteId(finalQuote.quoteRequestId),
+        invoice: (appData.invoices || []).find(inv => inv.finalQuoteId === finalQuoteId) || null
+    };
+}
+
+function getPipelineState() {
+    const defaultState = { quotes: {}, invoices: {}, appointments: {} };
+    try {
+        const stored = JSON.parse(localStorage.getItem(PIPELINE_STATE_KEY) || '{}');
+        return {
+            quotes: stored.quotes || {},
+            invoices: stored.invoices || {},
+            appointments: stored.appointments || {}
+        };
+    } catch (err) {
+        console.warn('Pipeline state reset due to parse error', err);
+        localStorage.removeItem(PIPELINE_STATE_KEY);
+        return defaultState;
+    }
+}
+
+function savePipelineState(nextState) {
+    localStorage.setItem(PIPELINE_STATE_KEY, JSON.stringify(nextState));
+    return nextState;
+}
+
+function recordPipelineHistory(entry) {
+    const history = JSON.parse(localStorage.getItem(PIPELINE_HISTORY_KEY) || '[]');
+    const timestamp = entry.timestamp || new Date().toISOString();
+    history.unshift({ ...entry, timestamp });
+    localStorage.setItem(PIPELINE_HISTORY_KEY, JSON.stringify(history.slice(0, 15)));
+    return history;
+}
+
+function getPipelineHistory() {
+    return JSON.parse(localStorage.getItem(PIPELINE_HISTORY_KEY) || '[]');
+}
+
+function updateQuoteStage(finalQuoteId, stage, meta = {}) {
+    const state = getPipelineState();
+    state.quotes[finalQuoteId] = { stage, updatedAt: new Date().toISOString(), ...meta };
+    savePipelineState(state);
+    recordPipelineHistory({
+        type: 'quote',
+        finalQuoteId,
+        stage,
+        label: meta.label || `Quote ${finalQuoteId} → ${stage}`,
+        customer: meta.customerName || null
+    });
+    return state.quotes[finalQuoteId];
+}
+
+function updateInvoiceStatus(invoiceId, status, meta = {}) {
+    const state = getPipelineState();
+    state.invoices[invoiceId] = { status, updatedAt: new Date().toISOString(), ...meta };
+    savePipelineState(state);
+    recordPipelineHistory({
+        type: 'invoice',
+        invoiceId,
+        stage: status,
+        label: meta.label || `Invoice ${invoiceId} → ${status}`,
+        customer: meta.customerName || null
+    });
+    return state.invoices[invoiceId];
+}
+
+function getQuoteStage(finalQuoteId, fallback) {
+    const state = getPipelineState();
+    return state.quotes[finalQuoteId]?.stage || fallback || 'awaiting-approval';
+}
+
+function getInvoiceStage(invoiceId, fallback) {
+    const state = getPipelineState();
+    return state.invoices[invoiceId]?.status || (fallback ? (fallback.paid ? 'paid' : 'sent') : 'draft');
+}
+
+window.dashboardHelpers = {
+    getQuoteRequestById,
+    getFinalQuoteById,
+    getQuoteContext,
+    getAppointmentByQuoteId,
+    getInspectionByQuoteId,
+    getInvoiceById,
+    getPipelineState,
+    getPipelineHistory,
+    updateQuoteStage,
+    updateInvoiceStatus,
+    getQuoteStage,
+    getInvoiceStage,
+    recordPipelineHistory,
+    saveQuoteRequest,
+    getQuoteRequests
+};

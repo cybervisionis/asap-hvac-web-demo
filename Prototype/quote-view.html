@@ -42,21 +42,18 @@
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 2px solid var(--neutral-light);">
                     <div>
                         <h3>Customer:</h3>
-                        <p>Jane Smith<br>123 Main St, Houston, TX 77001<br>(281) 555-0123</p>
+                        <p id="customer-details">Loading...</p>
                     </div>
                     <div style="text-align: right;">
-                        <p><strong>Quote #:</strong> Q-2025-001</p>
-                        <p><strong>Date:</strong> <span id="quote-date"></span></p>
-                        <p><strong>Expires:</strong> <span id="expiry-date"></span></p>
-                        <p style="color: var(--accent); font-weight: 600;">Valid for 14 days</p>
+                        <p><strong>Quote #:</strong> <span id="quote-number">—</span></p>
+                        <p><strong>Date:</strong> <span id="quote-date">—</span></p>
+                        <p><strong>Expires:</strong> <span id="expiry-date">—</span></p>
+                        <p id="quote-validity" style="color: var(--accent); font-weight: 600;">Valid for 14 days</p>
                     </div>
                 </div>
 
                 <h3>Inspection Findings:</h3>
-                <ul style="margin-bottom: 1rem;">
-                    <li><strong>[CF-01 - Critical]</strong> Compressor failure detected</li>
-                    <li><strong>[RL-02 - Moderate]</strong> Refrigerant leak in condenser coil</li>
-                </ul>
+                <ul id="findings-list" style="margin-bottom: 1rem;"></ul>
 
                 <h3>Recommended Work:</h3>
                 <table style="width: 100%; margin-bottom: 2rem; border-collapse: collapse;">
@@ -66,53 +63,37 @@
                             <th style="text-align: right; padding: 0.75rem;">Amount</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td style="padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">Base Diagnostic Service</td>
-                            <td style="text-align: right; padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">$109.00</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">Compressor Replacement</td>
-                            <td style="text-align: right; padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">$2,400.00</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">Refrigerant Recharge (R-410A)</td>
-                            <td style="text-align: right; padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">$350.00</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">Labor (6 hours)</td>
-                            <td style="text-align: right; padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">$141.00</td>
-                        </tr>
+                    <tbody id="line-items-body"></tbody>
+                    <tfoot>
                         <tr style="font-size: 1.25rem; font-weight: 700; color: var(--primary);">
                             <td style="padding: 0.75rem; border-top: 2px solid var(--primary);">Total Investment:</td>
-                            <td style="text-align: right; padding: 0.75rem; border-top: 2px solid var(--primary);">$3,000.00</td>
+                            <td id="total-amount" style="text-align: right; padding: 0.75rem; border-top: 2px solid var(--primary);">—</td>
                         </tr>
-                    </tbody>
+                    </tfoot>
                 </table>
 
-                <div class="alert alert-warning" style="margin-bottom: 1rem;">
+                <div class="alert alert-warning" style="margin-bottom: 1rem;" id="parts-note">
                     <strong>Parts Order Note:</strong><br>
-                    Compressor unit has been ordered. Estimated arrival: 5-7 business days. 
-                    We will contact you to schedule installation once parts arrive.
+                    Tracking live updates...
                 </div>
 
                 <h3>Additional Recommendations:</h3>
-                <p>✅ Annual Maintenance Plan (Basic) - $169/year<br>
-                   <small>Includes 2 tune-ups, priority scheduling, and 10% off service calls.</small></p>
+                <ul id="recommendations-list" style="margin-bottom: 0.5rem;"></ul>
+                <p id="plan-suggestion"></p>
 
                 <div id="action-buttons" style="margin-top: 2rem;">
-                    <button class="btn btn-accent" style="width: 100%; margin-bottom: 0.5rem;" onclick="approveQuote()">Approve & Generate Invoice</button>
-                    <button class="btn btn-outline" style="width: 100%; margin-bottom: 0.5rem;" onclick="requestRevision()">Request Revision</button>
-                    <button class="btn btn-outline" style="width: 100%;" onclick="askQuestion()">Ask a Question</button>
+                    <button class="btn btn-accent" style="width: 100%; margin-bottom: 0.5rem;" id="approve-btn">Approve & Generate Invoice</button>
+                    <button class="btn btn-outline" style="width: 100%; margin-bottom: 0.5rem;" id="revision-btn">Request Revision</button>
+                    <button class="btn btn-outline" style="width: 100%;" id="question-btn">Ask a Question</button>
                 </div>
 
                 <div id="approval-message" class="hidden mt-2">
                     <div class="alert alert-success">
                         <h3>✅ Quote Approved!</h3>
-                        <p>Thank you for approving your quote. Your invoice is being prepared.</p>
+                        <p id="approval-copy">Thank you for approving your quote. Your invoice is being prepared.</p>
                         <p>You will receive an email shortly with payment instructions and scheduling details for the installation.</p>
                     </div>
-                    <a href="invoice.html" class="btn btn-primary" style="margin-top: 1rem;">View Invoice & Pay Now</a>
+                    <a href="invoice.html" id="invoice-link" class="btn btn-primary" style="margin-top: 1rem;">View Invoice & Pay Now</a>
                 </div>
             </div>
         </div>
@@ -124,26 +105,103 @@
         </div>
     </footer>
 
+    <script src="js/app.js"></script>
     <script>
-        const today = new Date();
-        document.getElementById('quote-date').textContent = today.toLocaleDateString();
-        
-        const expiry = new Date(today);
-        expiry.setDate(expiry.getDate() + 14);
-        document.getElementById('expiry-date').textContent = expiry.toLocaleDateString();
+        const params = new URLSearchParams(window.location.search);
+        const formattedCurrency = (value) => `$${Number(value || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+        let currentContext = null;
+
+        async function initQuoteView() {
+            await loadData();
+            const requestedQuote = params.get('quote');
+            const fallback = (appData.finalQuotes || [])[0]?.id;
+            const quoteId = requestedQuote || fallback;
+            currentContext = dashboardHelpers.getQuoteContext(quoteId);
+            if (!currentContext) {
+                document.querySelector('.quote-container').innerHTML = '<div class="alert alert-warning">Quote not found. Return to your <a href="admin/dashboard.html">dashboard</a>.</div>';
+                return;
+            }
+            hydrateQuoteDetails();
+            wireActions();
+        }
+
+        function hydrateQuoteDetails() {
+            const { quoteRequest, finalQuote, inspection, invoice } = currentContext;
+            document.getElementById('customer-details').innerHTML = `${quoteRequest.customerName}<br>${quoteRequest.address}<br>${quoteRequest.contactPhone}`;
+            document.getElementById('quote-number').textContent = finalQuote.id.toUpperCase();
+            document.getElementById('quote-date').textContent = new Date().toLocaleDateString();
+            document.getElementById('expiry-date').textContent = new Date(finalQuote.expiresOn).toLocaleDateString();
+            document.getElementById('quote-validity').textContent = `Valid until ${new Date(finalQuote.expiresOn).toLocaleDateString()}`;
+
+            const findingsList = document.getElementById('findings-list');
+            if (inspection?.findings?.length) {
+                findingsList.innerHTML = inspection.findings.map(f => `<li><strong>[${f.code} - ${f.severity?.toUpperCase()}]</strong> ${f.description}</li>`).join('');
+            } else {
+                findingsList.innerHTML = '<li>No inspection findings recorded yet.</li>';
+            }
+
+            const lineItems = [];
+            lineItems.push({ label: 'Diagnostic & Visit Credit', amount: finalQuote.baseEstimate });
+            (inspection?.adjustments || []).forEach(item => lineItems.push({ label: item.description, amount: item.cost }));
+            const tableBody = document.getElementById('line-items-body');
+            tableBody.innerHTML = lineItems.map(item => `
+                <tr>
+                    <td style="padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">${item.label}</td>
+                    <td style="text-align: right; padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">${formattedCurrency(item.amount)}</td>
+                </tr>`).join('');
+            document.getElementById('total-amount').textContent = formattedCurrency(finalQuote.finalTotal);
+
+            const recList = document.getElementById('recommendations-list');
+            if (inspection?.recommendedServices?.length) {
+                recList.innerHTML = inspection.recommendedServices.map(item => `<li>✅ ${item}</li>`).join('');
+            } else {
+                recList.innerHTML = '<li>We will add recommendations after your first tune-up.</li>';
+            }
+            document.getElementById('plan-suggestion').innerHTML = `⭐ Upgrade to the <strong>Comfort Club Premium</strong> plan for $199/year and lock in priority install windows.`;
+
+            const partsOrder = (appData.partsOrders || []).find(po => po.finalQuoteId === finalQuote.id);
+            const partsNote = document.getElementById('parts-note');
+            if (partsOrder) {
+                partsNote.innerHTML = `<strong>Parts Order:</strong><br>${partsOrder.items.length} items reserved · ETA ${new Date(partsOrder.etaDate).toLocaleDateString()}<br><small>${partsOrder.notes}</small>`;
+            } else {
+                partsNote.innerHTML = '<strong>Parts Order:</strong><br>No specialty parts required for this repair.';
+            }
+
+            document.getElementById('invoice-link').href = invoice ? `invoice.html?invoice=${invoice.id}` : 'invoice.html';
+            const stage = dashboardHelpers.getQuoteStage(finalQuote.id, finalQuote.status);
+            if (['approved', 'paid'].includes(stage)) {
+                document.getElementById('action-buttons').style.display = 'none';
+                document.getElementById('approval-message').classList.remove('hidden');
+            }
+        }
+
+        function wireActions() {
+            document.getElementById('approve-btn').addEventListener('click', approveQuote);
+            document.getElementById('revision-btn').addEventListener('click', requestRevision);
+            document.getElementById('question-btn').addEventListener('click', askQuestion);
+        }
 
         function approveQuote() {
+            dashboardHelpers.updateQuoteStage(currentContext.finalQuote.id, 'approved', { customerName: currentContext.quoteRequest.customerName });
+            if (currentContext.invoice) {
+                dashboardHelpers.updateInvoiceStatus(currentContext.invoice.id, 'sent', { customerName: currentContext.quoteRequest.customerName, label: `Invoice ${currentContext.invoice.id} auto-sent from homeowner approval` });
+                document.getElementById('invoice-link').href = `invoice.html?invoice=${currentContext.invoice.id}`;
+            }
             document.getElementById('action-buttons').style.display = 'none';
             document.getElementById('approval-message').classList.remove('hidden');
+            document.getElementById('approval-copy').textContent = 'Great news—our dispatch desk is prepping your install packet. You can pay online or on-site when the crew arrives.';
         }
 
         function requestRevision() {
-            alert('In a production system, this would open a form to request changes to the quote.');
+            dashboardHelpers.updateQuoteStage(currentContext.finalQuote.id, 'needs-revision', { customerName: currentContext.quoteRequest.customerName, label: `${currentContext.quoteRequest.customerName} requested edits` });
+            alert('Thanks! A comfort advisor will follow up with revised options.');
         }
 
         function askQuestion() {
-            alert('In a production system, this would open a messaging interface or contact form.');
+            alert('In production, this would launch in-app chat with your assigned comfort advisor.');
         }
+
+        document.addEventListener('DOMContentLoaded', initQuoteView);
     </script>
 </body>
 </html>
