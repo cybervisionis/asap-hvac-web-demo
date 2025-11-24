@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Quote - ASAP HVAC</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .quote-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <a href="index.html" class="logo"><img src="images/logo.svg" alt="ASAP HVAC" style="height: 50px;"></a>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="services.html">Services</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="plans.html">Maintenance Plans</a></li>
+                    <li><a href="admin/dashboard.html">Admin</a></li>
+                    <li><a href="quote.html" class="btn btn-primary">Request Quote</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="section">
+        <div class="container">
+            <h1>Your Final Quote <span class="demo-badge">DEMO</span></h1>
+            
+            <div class="quote-container">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 2px solid var(--neutral-light);">
+                    <div>
+                        <h3>Customer:</h3>
+                        <p>Jane Smith<br>123 Main St, Houston, TX 77001<br>(281) 555-0123</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <p><strong>Quote #:</strong> Q-2025-001</p>
+                        <p><strong>Date:</strong> <span id="quote-date"></span></p>
+                        <p><strong>Expires:</strong> <span id="expiry-date"></span></p>
+                        <p style="color: var(--accent); font-weight: 600;">Valid for 14 days</p>
+                    </div>
+                </div>
+
+                <h3>Inspection Findings:</h3>
+                <ul style="margin-bottom: 1rem;">
+                    <li><strong>[CF-01 - Critical]</strong> Compressor failure detected</li>
+                    <li><strong>[RL-02 - Moderate]</strong> Refrigerant leak in condenser coil</li>
+                </ul>
+
+                <h3>Recommended Work:</h3>
+                <table style="width: 100%; margin-bottom: 2rem; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: var(--neutral-light); border-bottom: 2px solid var(--neutral-dark);">
+                            <th style="text-align: left; padding: 0.75rem;">Description</th>
+                            <th style="text-align: right; padding: 0.75rem;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">Base Diagnostic Service</td>
+                            <td style="text-align: right; padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">$109.00</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">Compressor Replacement</td>
+                            <td style="text-align: right; padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">$2,400.00</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">Refrigerant Recharge (R-410A)</td>
+                            <td style="text-align: right; padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">$350.00</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">Labor (6 hours)</td>
+                            <td style="text-align: right; padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">$141.00</td>
+                        </tr>
+                        <tr style="font-size: 1.25rem; font-weight: 700; color: var(--primary);">
+                            <td style="padding: 0.75rem; border-top: 2px solid var(--primary);">Total Investment:</td>
+                            <td style="text-align: right; padding: 0.75rem; border-top: 2px solid var(--primary);">$3,000.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="alert alert-warning" style="margin-bottom: 1rem;">
+                    <strong>Parts Order Note:</strong><br>
+                    Compressor unit has been ordered. Estimated arrival: 5-7 business days. 
+                    We will contact you to schedule installation once parts arrive.
+                </div>
+
+                <h3>Additional Recommendations:</h3>
+                <p>✅ Annual Maintenance Plan (Basic) - $169/year<br>
+                   <small>Includes 2 tune-ups, priority scheduling, and 10% off service calls.</small></p>
+
+                <div id="action-buttons" style="margin-top: 2rem;">
+                    <button class="btn btn-accent" style="width: 100%; margin-bottom: 0.5rem;" onclick="approveQuote()">Approve & Generate Invoice</button>
+                    <button class="btn btn-outline" style="width: 100%; margin-bottom: 0.5rem;" onclick="requestRevision()">Request Revision</button>
+                    <button class="btn btn-outline" style="width: 100%;" onclick="askQuestion()">Ask a Question</button>
+                </div>
+
+                <div id="approval-message" class="hidden mt-2">
+                    <div class="alert alert-success">
+                        <h3>✅ Quote Approved!</h3>
+                        <p>Thank you for approving your quote. Your invoice is being prepared.</p>
+                        <p>You will receive an email shortly with payment instructions and scheduling details for the installation.</p>
+                    </div>
+                    <a href="invoice.html" class="btn btn-primary" style="margin-top: 1rem;">View Invoice & Pay Now</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 ASAP HVAC – Licensed & Insured <span class="demo-badge">DEMO</span></p>
+        </div>
+    </footer>
+
+    <script>
+        const today = new Date();
+        document.getElementById('quote-date').textContent = today.toLocaleDateString();
+        
+        const expiry = new Date(today);
+        expiry.setDate(expiry.getDate() + 14);
+        document.getElementById('expiry-date').textContent = expiry.toLocaleDateString();
+
+        function approveQuote() {
+            document.getElementById('action-buttons').style.display = 'none';
+            document.getElementById('approval-message').classList.remove('hidden');
+        }
+
+        function requestRevision() {
+            alert('In a production system, this would open a form to request changes to the quote.');
+        }
+
+        function askQuestion() {
+            alert('In a production system, this would open a messaging interface or contact form.');
+        }
+    </script>
+</body>
+</html>

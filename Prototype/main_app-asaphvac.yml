@@ -1,3 +1,6 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
 name: Deploy static site to Azure Web App - app-asapHvac
 
 on:
@@ -10,8 +13,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     permissions:
-      id-token: write
-      contents: read
+      id-token: write # Required for requesting the JWT
+      contents: read # Required for actions/checkout
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

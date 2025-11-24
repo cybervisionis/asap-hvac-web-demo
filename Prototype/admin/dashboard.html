@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - ASAP HVAC</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+        }
+        .dashboard-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .dashboard-card h2 {
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+        .status-requested { background: #FFF4E5; color: #D97706; }
+        .status-scheduled { background: #DBEAFE; color: #2563EB; }
+        .status-completed { background: #D1FAE5; color: #059669; }
+        .status-paid { background: #D1FAE5; color: #059669; }
+        .status-outstanding { background: #FEE2E2; color: #DC2626; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        table th { text-align: left; padding: 0.5rem; border-bottom: 2px solid var(--neutral-light); }
+        table td { padding: 0.5rem; border-bottom: 1px solid var(--neutral-light); }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <a href="../index.html" class="logo"><img src="../images/logo.svg" alt="ASAP HVAC" style="height: 50px;"></a>
+            <nav>
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="../services.html">Services</a></li>
+                    <li><a href="../about.html">About</a></li>
+                    <li><a href="../contact.html">Contact</a></li>
+                    <li><a href="../plans.html">Maintenance Plans</a></li>
+                    <li><a href="dashboard.html" class="btn btn-primary">Admin Dashboard</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="section">
+        <div class="container">
+            <h1>Admin Dashboard <span class="demo-badge">DEMO</span></h1>
+            <p style="margin-bottom: 2rem;">Manage quote requests, inspections, appointments, and invoices.</p>
+            
+            <div class="dashboard-grid">
+                <!-- Quote Requests -->
+                <div class="dashboard-card">
+                    <h2>Recent Quote Requests</h2>
+                    <div id="quote-requests-list"></div>
+                </div>
+
+                <!-- Scheduled Appointments -->
+                <div class="dashboard-card">
+                    <h2>Upcoming Appointments</h2>
+                    <div id="appointments-list"></div>
+                </div>
+
+                <!-- Invoices -->
+                <div class="dashboard-card">
+                    <h2>Recent Invoices</h2>
+                    <div id="invoices-list"></div>
+                </div>
+
+                <!-- Maintenance Plans -->
+                <div class="dashboard-card">
+                    <h2>Active Maintenance Members</h2>
+                    <div id="members-list"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 ASAP HVAC – Licensed & Insured <span class="demo-badge">DEMO</span></p>
+        </div>
+    </footer>
+
+    <script src="../js/app.js"></script>
+    <script>
+        loadData().then(() => {
+            // Quote Requests
+            const quotesList = document.getElementById('quote-requests-list');
+            const storedQuotes = getQuoteRequests();
+            const allQuotes = [...appData.quoteRequests, ...storedQuotes];
+            
+            if (allQuotes.length === 0) {
+                quotesList.innerHTML = '<p style="color: var(--neutral-dark);">No quote requests yet. <a href="../quote.html">Create one</a></p>';
+            } else {
+                let quotesHtml = '<table><tr><th>Customer</th><th>Service</th><th>Status</th><th>Date</th></tr>';
+                allQuotes.forEach(q => {
+                    quotesHtml += 
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td><span class="status-badge status-"></span></td>
+                            <td></td>
+                        </tr>
+                    ;
+                });
+                quotesHtml += '</table>';
+                quotesList.innerHTML = quotesHtml;
+            }
+
+            // Appointments
+            const appointmentsList = document.getElementById('appointments-list');
+            if (appData.appointments.length === 0) {
+                appointmentsList.innerHTML = '<p style="color: var(--neutral-dark);">No scheduled appointments.</p>';
+            } else {
+                let apptHtml = '<table><tr><th>Customer</th><th>Date</th><th>Window</th><th>Status</th></tr>';
+                appData.appointments.forEach(a => {
+                    apptHtml += 
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td><span class="status-badge status-"></span></td>
+                        </tr>
+                    ;
+                });
+                apptHtml += '</table>';
+                appointmentsList.innerHTML = apptHtml;
+            }
+
+            // Invoices
+            const invoicesList = document.getElementById('invoices-list');
+            if (appData.invoices.length === 0) {
+                invoicesList.innerHTML = '<p style="color: var(--neutral-dark);">No invoices yet.</p>';
+            } else {
+                let invHtml = '<table><tr><th>Customer</th><th>Amount</th><th>Status</th><th>Date</th></tr>';
+                appData.invoices.forEach(inv => {
+                    invHtml += 
+                        <tr>
+                            <td></td>
+                            <td>$</td>
+                            <td><span class="status-badge status-"></span></td>
+                            <td></td>
+                        </tr>
+                    ;
+                });
+                invHtml += '</table>';
+                invoicesList.innerHTML = invHtml;
+            }
+
+            // Maintenance Members
+            const membersList = document.getElementById('members-list');
+            const activeMembers = appData.customers.filter(c => c.maintenancePlanId);
+            if (activeMembers.length === 0) {
+                membersList.innerHTML = '<p style="color: var(--neutral-dark);">No active maintenance members.</p>';
+            } else {
+                let membersHtml = '<table><tr><th>Customer</th><th>Plan</th><th>Enrolled</th></tr>';
+                activeMembers.forEach(m => {
+                    const plan = appData.maintenancePlans.find(p => p.id === m.maintenancePlanId);
+                    membersHtml += 
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    ;
+                });
+                membersHtml += '</table>';
+                membersList.innerHTML = membersHtml;
+            }
+        });
+    </script>
+</body>
+</html>

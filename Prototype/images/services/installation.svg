@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <rect width="400" height="300" fill="#E8F5E9"/>
+  <!-- Technician with tools -->
+  <ellipse cx="200" cy="240" rx="60" ry="10" fill="#CCCCCC" opacity="0.3"/>
+  <rect x="170" y="160" width="60" height="80" rx="30" fill="#FF7A00"/>
+  <circle cx="200" cy="140" r="25" fill="#FFD8B8"/>
+  <rect x="185" y="200" width="12" height="40" fill="#FF7A00"/>
+  <rect x="203" y="200" width="12" height="40" fill="#FF7A00"/>
+  <!-- Tool -->
+  <rect x="140" y="180" width="40" height="8" rx="4" fill="#808080"/>
+  <text x="200" y="285" font-family="Arial" font-size="16" fill="#2C3E50" text-anchor="middle" font-weight="bold">Installation</text>
+</svg>

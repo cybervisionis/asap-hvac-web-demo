@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finalize Inspection - ASAP HVAC Admin</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        .inspection-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+        .panel {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .finding-row, .adjustment-row {
+            display: grid;
+            grid-template-columns: 1fr 2fr 100px auto;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            align-items: center;
+        }
+        .severity-tag {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .severity-minor { background: #FEF3C7; color: #92400E; }
+        .severity-moderate { background: #FED7AA; color: #9A3412; }
+        .severity-critical { background: #FEE2E2; color: #991B1B; }
+        @media (max-width: 768px) {
+            .inspection-layout { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <a href="../index.html" class="logo"><img src="../images/logo.svg" alt="ASAP HVAC" style="height: 50px;"></a>
+            <nav>
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="inspection.html" class="btn btn-primary">Finalize Inspection</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="section">
+        <div class="container">
+            <h1>Finalize Inspection <span class="demo-badge">DEMO</span></h1>
+            <p>Add findings and adjustments, then publish the final quote or generate a service-fee invoice.</p>
+            
+            <div class="inspection-layout">
+                <!-- Left: Findings & Adjustments -->
+                <div class="panel">
+                    <h2>Inspection Details</h2>
+                    <p><strong>Customer:</strong> Jane Smith</p>
+                    <p><strong>Service:</strong> Repair / Diagnostic</p>
+                    <p><strong>Initial Estimate:</strong> $250–$650</p>
+                    
+                    <h3 style="margin-top: 2rem;">Findings</h3>
+                    <div id="findings-list">
+                        <div class="finding-row">
+                            <input type="text" placeholder="Code" value="CF-01">
+                            <input type="text" placeholder="Description" value="Compressor failure detected">
+                            <select>
+                                <option value="critical" selected>Critical</option>
+                                <option value="moderate">Moderate</option>
+                                <option value="minor">Minor</option>
+                            </select>
+                            <button class="btn btn-outline" style="font-size: 0.8rem;">Remove</button>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline" onclick="addFinding()">+ Add Finding</button>
+
+                    <h3 style="margin-top: 2rem;">Cost Adjustments</h3>
+                    <div id="adjustments-list">
+                        <div class="adjustment-row">
+                            <input type="text" placeholder="Description" value="Compressor replacement">
+                            <input type="number" placeholder="Cost" value="2400">
+                            <button class="btn btn-outline" style="font-size: 0.8rem;">Remove</button>
+                        </div>
+                        <div class="adjustment-row">
+                            <input type="text" placeholder="Description" value="Refrigerant recharge">
+                            <input type="number" placeholder="Cost" value="350">
+                            <button class="btn btn-outline" style="font-size: 0.8rem;">Remove</button>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline" onclick="addAdjustment()">+ Add Adjustment</button>
+
+                    <h3 style="margin-top: 2rem;">Recommended Services</h3>
+                    <div>
+                        <label><input type="checkbox" checked> Annual Maintenance Plan</label><br>
+                        <label><input type="checkbox"> Ductwork Inspection</label><br>
+                        <label><input type="checkbox"> Thermostat Upgrade</label>
+                    </div>
+                </div>
+
+                <!-- Right: Summary & Actions -->
+                <div class="panel">
+                    <h2>Quote Summary</h2>
+                    <table style="width: 100%; margin-top: 1rem;">
+                        <tr>
+                            <td>Base Estimate:</td>
+                            <td style="text-align: right; font-weight: 600;">$250</td>
+                        </tr>
+                        <tr>
+                            <td>Adjustments:</td>
+                            <td style="text-align: right; font-weight: 600;">$2,750</td>
+                        </tr>
+                        <tr style="border-top: 2px solid var(--neutral-light); font-size: 1.25rem; color: var(--primary);">
+                            <td><strong>Final Total:</strong></td>
+                            <td style="text-align: right;"><strong>$3,000</strong></td>
+                        </tr>
+                    </table>
+
+                    <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--neutral-dark);">
+                        Quote expires 14 days from approval.
+                    </p>
+
+                    <div style="margin-top: 2rem;">
+                        <button class="btn btn-accent" onclick="publishQuote()">Publish Final Quote</button>
+                        <button class="btn btn-primary" onclick="generateServiceFee()" style="margin-top: 0.5rem;">Generate Service-Fee Invoice</button>
+                        <button class="btn btn-outline" onclick="createPartsOrder()" style="margin-top: 0.5rem;">Create Parts Order</button>
+                    </div>
+
+                    <div id="action-result" class="hidden mt-2"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 ASAP HVAC – Licensed & Insured <span class="demo-badge">DEMO</span></p>
+        </div>
+    </footer>
+
+    <script src="../js/app.js"></script>
+    <script>
+        function addFinding() {
+            const list = document.getElementById('findings-list');
+            const row = document.createElement('div');
+            row.className = 'finding-row';
+            row.innerHTML = 
+                <input type="text" placeholder="Code">
+                <input type="text" placeholder="Description">
+                <select>
+                    <option value="critical">Critical</option>
+                    <option value="moderate">Moderate</option>
+                    <option value="minor">Minor</option>
+                </select>
+                <button class="btn btn-outline" style="font-size: 0.8rem;" onclick="this.parentElement.remove()">Remove</button>
+            ;
+            list.appendChild(row);
+        }
+
+        function addAdjustment() {
+            const list = document.getElementById('adjustments-list');
+            const row = document.createElement('div');
+            row.className = 'adjustment-row';
+            row.innerHTML = 
+                <input type="text" placeholder="Description">
+                <input type="number" placeholder="Cost">
+                <button class="btn btn-outline" style="font-size: 0.8rem;" onclick="this.parentElement.remove()">Remove</button>
+            ;
+            list.appendChild(row);
+        }
+
+        function publishQuote() {
+            document.getElementById('action-result').innerHTML = 
+                <div class="alert alert-success">
+                    <strong>Final Quote Published!</strong><br>
+                    Customer will receive email with quote details and approval link.<br>
+                    <a href="dashboard.html" class="btn btn-primary" style="margin-top: 1rem;">Back to Dashboard</a>
+                </div>
+            ;
+            document.getElementById('action-result').classList.remove('hidden');
+        }
+
+        function generateServiceFee() {
+            document.getElementById('action-result').innerHTML = 
+                <div class="alert alert-success">
+                    <strong>Service-Fee Invoice Generated!</strong><br>
+                    Invoice for $109 (diagnostic fee) sent to customer.<br>
+                    <a href="dashboard.html" class="btn btn-primary" style="margin-top: 1rem;">Back to Dashboard</a>
+                </div>
+            ;
+            document.getElementById('action-result').classList.remove('hidden');
+        }
+
+        function createPartsOrder() {
+            document.getElementById('action-result').innerHTML = 
+                <div class="alert alert-success">
+                    <strong>Parts Order Created!</strong><br>
+                    Order placed for compressor replacement parts. ETA: 5-7 business days.<br>
+                    <a href="dashboard.html" class="btn btn-primary" style="margin-top: 1rem;">Back to Dashboard</a>
+                </div>
+            ;
+            document.getElementById('action-result').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule Inspection - ASAP HVAC</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .schedule-container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <a href="index.html" class="logo"><img src="images/logo.svg" alt="ASAP HVAC" style="height: 50px;"></a>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="services.html">Services</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="plans.html">Maintenance Plans</a></li>
+                    <li><a href="admin/dashboard.html">Admin</a></li>
+                    <li><a href="quote.html" class="btn btn-primary">Request Quote</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="section">
+        <div class="container">
+            <h1>Schedule Your Inspection <span class="demo-badge">DEMO</span></h1>
+            
+            <div class="schedule-container">
+                <p>Choose a convenient date and time window for your on-site inspection.</p>
+                
+                <form id="schedule-form">
+                    <div class="form-group">
+                        <label>Preferred Date *</label>
+                        <input type="date" name="scheduledDate" required min="" id="date-input">
+                    </div>
+                    <div class="form-group">
+                        <label>Time Window *</label>
+                        <select name="scheduledWindow" required>
+                            <option value="">Select a time window</option>
+                            <option value="9am-11am">9:00 AM - 11:00 AM</option>
+                            <option value="12pm-2pm">12:00 PM - 2:00 PM</option>
+                            <option value="2pm-4pm">2:00 PM - 4:00 PM</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Notes / Special Instructions</label>
+                        <textarea name="notes" placeholder="Gate code, parking instructions, etc."></textarea>
+                    </div>
+                    
+                    <div class="alert alert-warning" style="margin-top: 1rem;">
+                        <strong>Cancellation Policy:</strong><br>
+                        You may cancel or reschedule up to 24 hours before your appointment at no charge. 
+                        Cancellations within 24 hours are subject to a $50 cancellation fee.
+                    </div>
+
+                    <button type="submit" class="btn btn-accent" style="width: 100%; margin-top: 1rem;">Confirm Appointment</button>
+                </form>
+
+                <div id="confirmation" class="hidden mt-2">
+                    <div class="alert alert-success">
+                        <h3>✅ Appointment Confirmed!</h3>
+                        <p>Your inspection is scheduled for:</p>
+                        <p><strong id="confirm-date"></strong> between <strong id="confirm-window"></strong></p>
+                        <p>You will receive a confirmation email and reminder 24 hours before your appointment.</p>
+                        <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--neutral-dark);">
+                            Please note: Cancellations within 24 hours of your appointment are subject to a $50 fee.
+                        </p>
+                    </div>
+                    <div style="margin-top: 1rem;">
+                        <a href="index.html" class="btn btn-primary">Back to Home</a>
+                        <a href="admin/dashboard.html" class="btn btn-outline">View Admin Dashboard (Demo)</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 ASAP HVAC – Licensed & Insured <span class="demo-badge">DEMO</span></p>
+        </div>
+    </footer>
+
+    <script>
+        // Set min date to tomorrow
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        document.getElementById('date-input').min = tomorrow.toISOString().split('T')[0];
+
+        document.getElementById('schedule-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            const dateStr = new Date(formData.get('scheduledDate')).toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            document.getElementById('confirm-date').textContent = dateStr;
+            document.getElementById('confirm-window').textContent = formData.get('scheduledWindow');
+            
+            document.getElementById('schedule-form').style.display = 'none';
+            document.getElementById('confirmation').classList.remove('hidden');
+        });
+    </script>
+</body>
+</html>

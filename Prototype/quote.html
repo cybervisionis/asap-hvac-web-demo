@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Quote - ASAP HVAC</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <a href="index.html" class="logo"><img src="images/logo.svg" alt="ASAP HVAC" style="height: 50px;"></a>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="services.html">Services</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="plans.html">Maintenance Plans</a></li>
+                    <li><a href="admin/dashboard.html">Admin</a></li>
+                    <li><a href="quote.html" class="btn btn-primary">Request Quote</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="section">
+        <div class="container">
+            <h1>Request an Online Quote <span class="demo-badge">DEMO</span></h1>
+            <div style="max-width: 700px; margin: 0 auto; background: white; padding: 2rem; border-radius: 8px;">
+                <p>Tell us what you're experiencing – we'll send an initial estimate and schedule an inspection.</p>
+                
+                <form id="quote-form">
+                    <div class="form-group">
+                        <label>Name *</label>
+                        <input type="text" name="customerName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email *</label>
+                        <input type="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone *</label>
+                        <input type="tel" name="contactPhone" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Address *</label>
+                        <input type="text" name="address" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Service Type *</label>
+                        <select name="serviceType" required>
+                            <option value="">Select a service</option>
+                            <option value="repair">Repair / Diagnostic</option>
+                            <option value="installation">Installation</option>
+                            <option value="maintenance">Maintenance / Tune-Up</option>
+                            <option value="ductwork">Ductwork</option>
+                            <option value="upgrade">Thermostat Upgrade</option>
+                            <option value="plumbing">Plumbing Assist</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Unit Age (approx. years)</label>
+                        <input type="number" name="unitAgeYears" min="0" max="50">
+                    </div>
+                    <div class="form-group">
+                        <label>Symptoms / Description</label>
+                        <textarea name="notes" placeholder="Describe the issue..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Urgency *</label>
+                        <select name="urgency" required>
+                            <option value="normal">Normal</option>
+                            <option value="urgent">Urgent</option>
+                            <option value="emergency">Emergency</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Preferred Inspection Date</label>
+                        <input type="date" name="requestedDate">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-accent">Submit Quote Request</button>
+                </form>
+
+                <div id="quote-result" class="hidden mt-2">
+                    <div class="alert alert-success">
+                        <h3>Quote Request Submitted!</h3>
+                        <p>Estimated range: <strong id="estimate-range"></strong></p>
+                        <p>We'll confirm your inspection within 2 business hours.</p>
+                        <p><small>Note: Submitting a quote request creates an inspection appointment request. You will receive confirmation and reminder notices.</small></p>
+                    </div>
+                    <div style="margin-top: 1rem;">
+                        <a href="index.html" class="btn btn-primary">Back to Home</a>
+                        <a href="admin/dashboard.html" class="btn btn-outline">View Admin Dashboard (Demo)</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 ASAP HVAC – Licensed & Insured <span class="demo-badge">DEMO</span></p>
+        </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+    <script>
+        document.getElementById('quote-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const quoteData = {
+                id: 'qr-' + Date.now(),
+                customerName: formData.get('customerName'),
+                contactPhone: formData.get('contactPhone'),
+                email: formData.get('email'),
+                address: formData.get('address'),
+                serviceType: formData.get('serviceType'),
+                unitAgeYears: formData.get('unitAgeYears') || 0,
+                urgency: formData.get('urgency'),
+                requestedDate: formData.get('requestedDate'),
+                notes: formData.get('notes'),
+                status: 'requested',
+                createdAt: new Date().toISOString()
+            };
+            
+            saveQuoteRequest(quoteData);
+            
+            // Show result
+            const rangeMap = {
+                'repair': '\$250–\$650',
+                'installation': '\$4,800–\$8,200',
+                'maintenance': '\$109–\$149',
+                'ductwork': '\$250–\$6,500',
+                'upgrade': '\$249–\$399',
+                'plumbing': '\$150–\$350'
+            };
+            
+            document.getElementById('estimate-range').textContent = rangeMap[quoteData.serviceType] || '$79–$500';
+            document.getElementById('quote-form').style.display = 'none';
+            document.getElementById('quote-result').classList.remove('hidden');
+        });
+    </script>
+</body>
+</html>

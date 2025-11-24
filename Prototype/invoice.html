@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice & Payment - ASAP HVAC</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .invoice-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .invoice-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--neutral-light);
+        }
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .payment-method {
+            border: 2px solid var(--neutral-light);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .payment-method:hover {
+            border-color: var(--primary);
+            background: var(--neutral-light);
+        }
+        .payment-method.selected {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <a href="index.html" class="logo"><img src="images/logo.svg" alt="ASAP HVAC" style="height: 50px;"></a>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="services.html">Services</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="plans.html">Maintenance Plans</a></li>
+                    <li><a href="admin/dashboard.html">Admin</a></li>
+                    <li><a href="quote.html" class="btn btn-primary">Request Quote</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="section">
+        <div class="container">
+            <h1>Invoice & Payment <span class="demo-badge">DEMO</span></h1>
+            
+            <div class="invoice-container">
+                <div class="invoice-header">
+                    <div>
+                        <h2>ASAP HVAC</h2>
+                        <p>Licensed & Insured<br>TACLA##### (Placeholder)<br>Greater Houston Area</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <p><strong>Invoice #:</strong> INV-2025-001</p>
+                        <p><strong>Date:</strong> <span id="invoice-date"></span></p>
+                        <p><strong>Due:</strong> Upon Receipt</p>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <h3>Bill To:</h3>
+                    <p>Jane Smith<br>123 Main St, Houston, TX 77001<br>(281) 555-0123</p>
+                </div>
+
+                <table style="width: 100%; margin-bottom: 2rem; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: var(--neutral-light); border-bottom: 2px solid var(--neutral-dark);">
+                            <th style="text-align: left; padding: 0.75rem;">Description</th>
+                            <th style="text-align: right; padding: 0.75rem;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">Diagnostic Service Call</td>
+                            <td style="text-align: right; padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">$109.00</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">Compressor Replacement</td>
+                            <td style="text-align: right; padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">$2,400.00</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">Refrigerant Recharge (R-410A)</td>
+                            <td style="text-align: right; padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">$350.00</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">Labor</td>
+                            <td style="text-align: right; padding: 0.75rem; border-bottom: 1px solid var(--neutral-light);">$141.00</td>
+                        </tr>
+                        <tr style="font-size: 1.25rem; font-weight: 700; color: var(--primary);">
+                            <td style="padding: 0.75rem; border-top: 2px solid var(--primary);">Total Due:</td>
+                            <td style="text-align: right; padding: 0.75rem; border-top: 2px solid var(--primary);">$3,000.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div id="payment-section">
+                    <h3>Select Payment Method</h3>
+                    <div class="payment-methods">
+                        <div class="payment-method" onclick="selectPayment('card')">
+                            <h4>💳 Card</h4>
+                            <p style="font-size: 0.9rem;">Credit/Debit</p>
+                        </div>
+                        <div class="payment-method" onclick="selectPayment('ach')">
+                            <h4>🏦 ACH</h4>
+                            <p style="font-size: 0.9rem;">Bank Transfer</p>
+                        </div>
+                        <div class="payment-method" onclick="selectPayment('cash')">
+                            <h4>💵 Cash/Check</h4>
+                            <p style="font-size: 0.9rem;">Pay on site</p>
+                        </div>
+                    </div>
+                    <button id="pay-btn" class="btn btn-accent" style="width: 100%; margin-top: 1rem;" disabled onclick="processPayment()">Complete Payment</button>
+                </div>
+
+                <div id="receipt" class="hidden">
+                    <div class="alert alert-success">
+                        <h3>✅ Payment Successful!</h3>
+                        <p>Your payment of <strong>$3,000.00</strong> has been processed.</p>
+                        <p><strong>Confirmation #:</strong> PAY-<span id="confirm-code"></span></p>
+                        <p style="margin-top: 1rem;">A receipt has been sent to your email.</p>
+                    </div>
+                    <div style="margin-top: 1rem;">
+                        <button class="btn btn-primary" onclick="window.print()">Print Receipt</button>
+                        <button class="btn btn-outline" onclick="downloadPDF()">Download PDF</button>
+                        <a href="index.html" class="btn btn-outline" style="margin-left: 0.5rem;">Back to Home</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 ASAP HVAC – Licensed & Insured <span class="demo-badge">DEMO</span></p>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('invoice-date').textContent = new Date().toLocaleDateString();
+        
+        let selectedMethod = null;
+
+        function selectPayment(method) {
+            selectedMethod = method;
+            document.querySelectorAll('.payment-method').forEach(el => el.classList.remove('selected'));
+            event.target.closest('.payment-method').classList.add('selected');
+            document.getElementById('pay-btn').disabled = false;
+        }
+
+        function processPayment() {
+            if (!selectedMethod) return;
+            
+            document.getElementById('payment-section').style.display = 'none';
+            document.getElementById('receipt').classList.remove('hidden');
+            document.getElementById('confirm-code').textContent = Date.now().toString().slice(-8);
+        }
+
+        function downloadPDF() {
+            alert('In a production system, this would generate and download a PDF receipt.');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services - ASAP HVAC</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <a href="index.html" class="logo"><img src="images/logo.svg" alt="ASAP HVAC" style="height: 50px;"></a>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="services.html">Services</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="plans.html">Maintenance Plans</a></li>
+                    <li><a href="admin/dashboard.html">Admin</a></li>
+                    <li><a href="quote.html" class="btn btn-primary">Request Quote</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="section">
+        <div class="container">
+            <h1>Our Services</h1>
+            <div class="card-grid" id="all-services">
+                <!-- All services loaded from JSON -->
+            </div>
+            <div class="alert alert-warning mt-2">
+                <strong>Demo Pricing:</strong> All pricing examples are approximate demo ranges; final quotes confirmed after inspection.
+            </div>
+            <div class="text-center mt-2">
+                <a href="quote.html" class="btn btn-accent">Request Custom Quote</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 ASAP HVAC – Licensed & Insured <span class="demo-badge">DEMO</span></p>
+        </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadData();
+            const grid = document.getElementById('all-services');
+            if (grid && appData.services) {
+                grid.innerHTML = appData.services.map(service => 
+                    `<div class="card">
+                        <h3>${service.name}</h3>
+                        <p class="card-price">${service.basePriceRange}</p>
+                        <p>${service.description}</p>
+                        <p><small>Category: ${service.category}</small></p>
+                    </div>`
+                ).join('');
+            }
+        });
+    </script>
+</body>
+</html>
