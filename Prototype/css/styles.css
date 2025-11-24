@@ -64,11 +64,24 @@ header .container {
   padding: 1rem;
 }
 
-.logo {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--primary);
+.logo,
+.site-logo {
+  display: inline-flex;
+  align-items: center;
   text-decoration: none;
+}
+
+.logo img,
+.site-logo img {
+  max-height: 76px !important;
+  height: auto !important;
+  width: auto;
+  transition: transform 0.2s ease;
+}
+
+.logo img:hover,
+.site-logo img:hover {
+  transform: scale(1.03);
 }
 
 nav ul {
@@ -186,6 +199,240 @@ nav a:hover {
   color: var(--primary);
   margin-bottom: 0.5rem;
   font-size: 1.5rem;
+}
+
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+  margin-top: 2.5rem;
+}
+
+.service-card {
+  position: relative;
+  background: linear-gradient(145deg, rgba(10,77,140,0.95) 0%, rgba(13,95,163,0.95) 50%, #12263a 100%);
+  color: var(--white);
+  border-radius: 18px;
+  padding: 1.5rem;
+  overflow: hidden;
+  box-shadow: 0 15px 35px -15px rgba(10,77,140,0.7);
+  border: 1px solid rgba(255,255,255,0.12);
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+.service-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 25px 45px -20px rgba(10,77,140,0.85);
+}
+
+.service-card__media {
+  height: 160px;
+  border-radius: 14px;
+  background-size: cover;
+  background-position: center;
+  margin-bottom: 1.25rem;
+  position: relative;
+}
+
+.service-card__media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.6) 100%);
+}
+
+.service-card h3 {
+  font-size: 1.35rem;
+  margin-bottom: 0.5rem;
+}
+
+.service-card .price-range {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: rgba(255,122,0,0.15);
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: #FFBE7A;
+  margin-bottom: 0.8rem;
+}
+
+.service-card .description {
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  color: rgba(255,255,255,0.85);
+}
+
+.service-card .feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+}
+
+.service-card .feature-list li {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.35rem;
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.85);
+}
+
+.service-card .feature-list svg {
+  width: 16px;
+  height: 16px;
+  stroke: #32D9A1;
+  stroke-width: 2;
+  fill: none;
+}
+
+.service-card .actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.btn-quote,
+.btn-outline-light {
+  padding: 0.65rem 1.1rem;
+  border-radius: 10px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-quote {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 10px 20px -12px rgba(255,122,0,0.8);
+}
+
+.btn-quote:hover {
+  transform: translateY(-2px);
+}
+
+.btn-outline-light {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.4);
+  color: #fff;
+}
+
+.service-tag {
+  position: absolute;
+  top: 12px;
+  left: 14px;
+  background: rgba(255,255,255,0.18);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+}
+
+.plan-grid {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  margin-top: 2.5rem;
+}
+
+.plan-card {
+  background: #fff;
+  border: 2px solid rgba(10,77,140,0.2);
+  border-radius: 22px;
+  padding: 1.75rem 1.5rem;
+  position: relative;
+  box-shadow: 0 15px 30px -20px rgba(10,77,140,0.6);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.plan-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px -18px rgba(10,77,140,0.55);
+}
+
+.plan-card.recommended {
+  border-color: var(--accent);
+  box-shadow: 0 25px 45px -20px rgba(255,122,0,0.5);
+}
+
+.plan-card.recommended::before {
+  content: 'TOP PICK';
+  position: absolute;
+  top: -12px;
+  left: 24px;
+  background: var(--accent);
+  color: #fff;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+.plan-card h3 {
+  color: var(--primary);
+  margin-bottom: 0.35rem;
+}
+
+.plan-card .plan-price {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+
+.plan-card .plan-description {
+  font-size: 0.95rem;
+  color: var(--gray);
+  margin-bottom: 1.25rem;
+}
+
+.plan-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.25rem;
+}
+
+.plan-features li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--neutral-dark);
+}
+
+.plan-features svg {
+  width: 18px;
+  height: 18px;
+  stroke: var(--primary);
+  stroke-width: 2;
+  fill: none;
+}
+
+.btn-enroll {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  background: var(--primary);
+  color: #fff;
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-enroll:hover {
+  background: #0d5fa3;
 }
 
 .form-group {

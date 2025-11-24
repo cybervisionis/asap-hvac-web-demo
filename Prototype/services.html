@@ -27,7 +27,7 @@
     <section class="section">
         <div class="container">
             <h1>Our Services</h1>
-            <div class="card-grid" id="all-services">
+            <div class="service-grid" id="all-services">
                 <!-- All services loaded from JSON -->
             </div>
             <div class="alert alert-warning mt-2">
@@ -51,14 +51,7 @@
             await loadData();
             const grid = document.getElementById('all-services');
             if (grid && appData.services) {
-                grid.innerHTML = appData.services.map(service => 
-                    `<div class="card">
-                        <h3>${service.name}</h3>
-                        <p class="card-price">${service.basePriceRange}</p>
-                        <p>${service.description}</p>
-                        <p><small>Category: ${service.category}</small></p>
-                    </div>`
-                ).join('');
+                grid.innerHTML = appData.services.map(service => buildServiceCardMarkup(service)).join('');
             }
         });
     </script>

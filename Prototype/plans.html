@@ -28,7 +28,7 @@
         <div class="container text-center">
             <h1>Maintenance Plans <span class="demo-badge">DEMO</span></h1>
             <p style="max-width: 700px; margin: 1rem auto;">Keep your system running efficiently. Save on repairs and extend equipment life with regular tune-ups.</p>
-            <div id="plans-grid" class="card-grid mt-2"></div>
+            <div id="plans-grid" class="plan-grid mt-2"></div>
         </div>
     </section>
 
@@ -42,21 +42,41 @@
     <script>
         loadData().then(() => {
             const plansGrid = document.getElementById('plans-grid');
-            appData.maintenancePlans.forEach(plan => {
-                const planCard = `
-                    <div class="card">
-                        <h3>${plan.name}</h3>
-                        <p style="font-size: 2rem; font-weight: 700; color: var(--primary);">$${plan.annualFee}</p>
-                        <p style="margin-bottom: 1rem;">${plan.description}</p>
-                        <ul style="text-align: left; margin-bottom: 1rem;">
-                            ${plan.includedServices.map(s => '<li>' + s + '</li>').join('')}
+            if (!plansGrid || !appData.maintenancePlans) return;
+
+            const planDescriptions = {
+                Basic: 'Entry-level tune-ups to keep essentials covered and prevent surprise breakdowns.',
+                Plus: 'Add deeper cleaning plus faster response windows for high-demand seasons.',
+                Premium: 'Full concierge care with IAQ monitoring, emergency access, and priority installs.'
+            };
+
+            const recommendedPlanId = 'plan-plus';
+            const checkIcon = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
+
+            plansGrid.innerHTML = appData.maintenancePlans.map(plan => {
+                const features = [
+                    ...plan.includedServices,
+                    `${plan.partsDiscountPct}% parts discount`,
+                    ...plan.extras
+                ];
+                return `
+                    <div class="plan-card ${plan.id === recommendedPlanId ? 'recommended' : ''}">
+                        <h3>${plan.planTier}</h3>
+                        <div class="plan-price">$${plan.annualFee}<span style="font-size: 0.75rem; font-weight: 500; color: var(--gray);">/yr</span></div>
+                        <p class="plan-description">${plan.description || planDescriptions[plan.planTier] || ''}</p>
+                        <ul class="plan-features">
+                            ${features.map(item => `<li>${checkIcon}<span>${item}</span></li>`).join('')}
                         </ul>
-                        ${plan.callDiscountPercent > 0 ? '<p><strong>Save ' + plan.callDiscountPercent + '% on service calls</strong></p>' : ''}
-                        ${plan.extras.length > 0 ? '<p style="font-size: 0.9rem; color: var(--neutral-dark);">Extras: ' + plan.extras.join(', ') + '</p>' : ''}
-                        <button class="btn btn-accent" style="margin-top: 1rem;">Enroll Now</button>
+                        <button class="btn-enroll" data-plan="${plan.id}">Enroll Now</button>
                     </div>
                 `;
-                plansGrid.innerHTML += planCard;
+            }).join('');
+
+            plansGrid.addEventListener('click', (event) => {
+                if (event.target.matches('.btn-enroll')) {
+                    const planId = event.target.getAttribute('data-plan');
+                    window.location.href = `quote.html?plan=${planId}`;
+                }
             });
         });
     </script>
