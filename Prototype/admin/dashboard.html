@@ -42,6 +42,7 @@
         }
         .dashboard-card {
             background: #fff;
+            border: 2px solid var(--neutral-light, #e2e8f0);
             border-radius: 12px;
             padding: 1.5rem;
             box-shadow: 0 15px 35px rgba(0,0,0,0.07);
@@ -286,33 +287,26 @@
         }
 
         function buildQuoteModels() {
-            const storedQuotes = getQuoteRequests();
-            const manualQuotes = storedQuotes.map(q => ({
-                quoteRequest: q,
-                finalQuote: null,
-                stage: q.status || 'awaiting-approval'
-            }));
-            const quotes = (appData.finalQuotes || []).map(fq => {
-                const quoteRequest = dashboardHelpers.getQuoteRequestById(fq.quoteRequestId);
-                const invoice = (appData.invoices || []).find(inv => inv.finalQuoteId === fq.id) || null;
-                const appointment = dashboardHelpers.getAppointmentByQuoteId(fq.quoteRequestId);
-                const stage = dashboardHelpers.getQuoteStage(fq.id, fq.status);
+            const combined = dashboardHelpers.getCombinedQuotes();
+            return combined.map(q => {
+                const finalQuote = (appData.finalQuotes || []).find(fq => fq.quoteRequestId === q.id);
+                const invoice = finalQuote ? (appData.invoices || []).find(inv => inv.finalQuoteId === finalQuote.id) : null;
+                const stage = finalQuote ? dashboardHelpers.getQuoteStage(finalQuote.id, finalQuote.status) : (q.status || 'awaiting-approval');
                 return {
-                    id: fq.id,
-                    finalQuote: fq,
-                    quoteRequest,
+                    id: finalQuote?.id || q.id,
+                    finalQuote,
+                    quoteRequest: q,
                     invoice,
-                    appointment,
-                    customerName: quoteRequest?.customerName || 'Unknown',
-                    serviceType: quoteRequest?.serviceType || 'General',
-                    expiresOn: fq.expiresOn,
-                    total: fq.finalTotal,
+                    customerName: q.customerName || 'Unknown',
+                    serviceType: q.serviceType || 'General',
+                    expiresOn: finalQuote?.expiresOn || null,
+                    total: finalQuote?.finalTotal || null,
                     stage,
                     stageClass: statusClassMap[stage] || 'status-requested',
-                    stageLabel: actionLabels[stage] || stage
+                    stageLabel: actionLabels[stage] || stage,
+                    isManual: q.source === 'manual'
                 };
-            });
-            return [...quotes, ...manualQuotes].sort((a, b) => {
+            }).sort((a, b) => {
                 const aDate = a.expiresOn ? new Date(a.expiresOn) : new Date();
                 const bDate = b.expiresOn ? new Date(b.expiresOn) : new Date();
                 return aDate - bDate;
@@ -332,7 +326,7 @@
                 const badge = `<span class="status-badge ${model.stageClass}">${model.stageLabel}</span>`;
                 const actions = [];
                 if (!model.finalQuote) {
-                    actions.push(`<span class="action-pill is-muted" data-action="collect-details" data-name="${model.quoteRequest?.customerName || ''}">Collect Details</span>`);
+                    actions.push(`<button class="action-pill is-muted" data-action="collect-details" data-quote-req-id="${model.quoteRequest?.id}" data-name="${model.quoteRequest?.customerName || ''}">Collect Details</button>`);
                 } else {
                     if (['awaiting-approval', 'quote-sent'].includes(model.stage)) {
                         actions.push(`<button class="action-pill" data-action="approve-quote" data-quote-id="${model.id}">Mark Approved</button>`);
@@ -503,6 +497,18 @@
             const quote = quoteId ? dashboardHelpers.getQuoteContext(quoteId) : null;
             const customerName = quote?.quoteRequest?.customerName;
             switch(action) {
+                case 'collect-details':
+                    const name = target.dataset.name || 'this customer';
+                    if (confirm(`Promote ${name}'s web submission into full quote? This will create a final quote and invoice record.`)) {
+                        const quoteReqId = target.closest('tr').querySelector('[data-action]')?.dataset.quoteReqId || target.dataset.quoteReqId;
+                        const promoted = dashboardHelpers.promoteManualQuote(quoteReqId || quote?.quoteRequest?.id);
+                        if (promoted) {
+                            alert(`✓ ${name} promoted to pipeline. You can now approve the quote and send invoice.`);
+                        } else {
+                            alert('Could not find quote request. Please refresh and try again.');
+                        }
+                    }
+                    break;
                 case 'approve-quote':
                     dashboardHelpers.updateQuoteStage(quoteId, 'approved', { customerName });
                     break;

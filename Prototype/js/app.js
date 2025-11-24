@@ -113,6 +113,70 @@ function getQuoteRequests() {
     return JSON.parse(localStorage.getItem('quoteRequests') || '[]');
 }
 
+function getCombinedQuotes() {
+    const stored = getQuoteRequests();
+    const seed = (appData.quoteRequests || []).map(q => ({ ...q, source: 'seed' }));
+    const manual = stored.map(q => ({ ...q, source: 'manual' }));
+    const allIds = new Set();
+    const combined = [];
+    [...seed, ...manual].forEach(q => {
+        if (!allIds.has(q.id)) {
+            allIds.add(q.id);
+            combined.push(q);
+        }
+    });
+    return combined.sort((a, b) => {
+        const aDate = a.requestedDate || a.createdAt || '';
+        const bDate = b.requestedDate || b.createdAt || '';
+        return aDate < bDate ? 1 : -1;
+    });
+}
+
+function promoteManualQuote(quoteRequestId) {
+    const stored = getQuoteRequests();
+    const match = stored.find(q => q.id === quoteRequestId);
+    if (!match) return null;
+    const finalQuoteId = 'fq-' + Date.now();
+    const invoiceId = 'inv-' + Date.now();
+    const customer = (appData.customers || []).find(c => c.email === match.email) || {
+        id: 'cust-' + Date.now(),
+        name: match.customerName,
+        primaryAddress: match.address,
+        email: match.email,
+        phone: match.contactPhone,
+        planTier: null,
+        maintenancePlanId: null
+    };
+    const finalQuote = {
+        id: finalQuoteId,
+        quoteRequestId: match.id,
+        baseEstimate: 150,
+        adjustmentsTotal: 0,
+        finalTotal: 150,
+        expiresOn: new Date(Date.now() + 14 * 86400000).toISOString().split('T')[0],
+        status: 'awaiting-approval'
+    };
+    const invoice = {
+        id: invoiceId,
+        finalQuoteId: finalQuoteId,
+        amountDue: finalQuote.finalTotal,
+        createdOn: new Date().toISOString().split('T')[0],
+        dueDate: new Date(Date.now() + 10 * 86400000).toISOString().split('T')[0],
+        paid: false,
+        paymentRef: null
+    };
+    if (!appData.finalQuotes) appData.finalQuotes = [];
+    if (!appData.invoices) appData.invoices = [];
+    if (!appData.customers) appData.customers = [];
+    appData.finalQuotes.push(finalQuote);
+    appData.invoices.push(invoice);
+    if (!appData.customers.find(c => c.id === customer.id)) {
+        appData.customers.push(customer);
+    }
+    updateQuoteStage(finalQuoteId, 'awaiting-approval', { customerName: match.customerName, label: `Promoted ${match.customerName} from web submission` });
+    return { finalQuote, invoice, customer };
+}
+
 function getQuoteRequestById(id) {
     return (appData.quoteRequests || []).find(q => q.id === id) || null;
 }
@@ -242,5 +306,7 @@ window.dashboardHelpers = {
     getInvoiceStage,
     recordPipelineHistory,
     saveQuoteRequest,
-    getQuoteRequests
+    getQuoteRequests,
+    getCombinedQuotes,
+    promoteManualQuote
 };

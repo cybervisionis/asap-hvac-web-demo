@@ -55,6 +55,34 @@
       "symptoms": ["System short cycling", "Burning smell"],
       "notes": "Wants quote on full system replacement.",
       "status": "quote-sent"
+    },
+    {
+      "id": "qr-1004",
+      "customerName": "Robert Chen",
+      "contactPhone": "832-555-0288",
+      "email": "robert.chen@example.com",
+      "address": "1422 Oak Manor Dr, Houston, TX",
+      "serviceType": "ductwork",
+      "urgency": "normal",
+      "requestedDate": "2025-11-28",
+      "unitAgeYears": 6,
+      "symptoms": ["Hot spots in bedrooms"],
+      "notes": "Suspect duct leaks in attic.",
+      "status": "awaiting-scheduling"
+    },
+    {
+      "id": "qr-1005",
+      "customerName": "Lisa Rodriguez",
+      "contactPhone": "713-555-0392",
+      "email": "lisa.rodriguez@example.com",
+      "address": "78 Pine Valley Ct, Sugar Land, TX",
+      "serviceType": "upgrade",
+      "urgency": "normal",
+      "requestedDate": "2025-11-30",
+      "unitAgeYears": 3,
+      "symptoms": ["Old thermostat"],
+      "notes": "Wants smart thermostat + WiFi.",
+      "status": "quote-sent"
     }
   ],
   "appointments": [
@@ -80,6 +108,22 @@
       "scheduledDate": "2025-11-21",
       "window": "8am-10am",
       "technician": "Luis Ortega",
+      "status": "completed"
+    },
+    {
+      "id": "appt-5004",
+      "quoteRequestId": "qr-1004",
+      "scheduledDate": "2025-11-29",
+      "window": "10am-12pm",
+      "technician": "Anthony Anderson",
+      "status": "scheduled"
+    },
+    {
+      "id": "appt-5005",
+      "quoteRequestId": "qr-1005",
+      "scheduledDate": "2025-12-01",
+      "window": "2pm-4pm",
+      "technician": "Sara Chen",
       "status": "completed"
     }
   ],
@@ -123,6 +167,32 @@
         { "description": "Seal ductwork", "cost": 780.00 }
       ],
       "recommendedServices": ["Premium install", "Duct sealing"]
+    },
+    {
+      "id": "insp-7004",
+      "quoteRequestId": "qr-1004",
+      "technician": "Anthony Anderson",
+      "findings": [
+        { "code": "duct-leak", "description": "Confirmed attic duct leaks near bedroom vents", "severity": "moderate" },
+        { "code": "low-insulation", "description": "Ductwork poorly insulated", "severity": "low" }
+      ],
+      "adjustments": [
+        { "description": "Seal duct leaks", "cost": 420.00 },
+        { "description": "Add duct insulation", "cost": 280.00 }
+      ],
+      "recommendedServices": ["Duct sealing", "Maintenance plan enrollment"]
+    },
+    {
+      "id": "insp-7005",
+      "quoteRequestId": "qr-1005",
+      "technician": "Sara Chen",
+      "findings": [
+        { "code": "old-thermostat", "description": "Mechanical thermostat no scheduling", "severity": "low" }
+      ],
+      "adjustments": [
+        { "description": "Install Nest Learning Thermostat", "cost": 329.00 }
+      ],
+      "recommendedServices": ["Smart thermostat", "WiFi setup"]
     }
   ],
   "finalQuotes": [
@@ -152,6 +222,24 @@
       "finalTotal": 7180.00,
       "expiresOn": "2025-12-08",
       "status": "awaiting-approval"
+    },
+    {
+      "id": "fq-9004",
+      "quoteRequestId": "qr-1004",
+      "baseEstimate": 450.00,
+      "adjustmentsTotal": 700.00,
+      "finalTotal": 1150.00,
+      "expiresOn": "2025-12-12",
+      "status": "awaiting-approval"
+    },
+    {
+      "id": "fq-9005",
+      "quoteRequestId": "qr-1005",
+      "baseEstimate": 249.00,
+      "adjustmentsTotal": 329.00,
+      "finalTotal": 578.00,
+      "expiresOn": "2025-12-14",
+      "status": "approved"
     }
   ],
   "invoices": [
@@ -179,6 +267,24 @@
       "amountDue": 7180.00,
       "createdOn": "2025-11-25",
       "dueDate": "2025-12-10",
+      "paid": false,
+      "paymentRef": null
+    },
+    {
+      "id": "inv-3004",
+      "finalQuoteId": "fq-9004",
+      "amountDue": 1150.00,
+      "createdOn": "2025-11-28",
+      "dueDate": "2025-12-08",
+      "paid": false,
+      "paymentRef": null
+    },
+    {
+      "id": "inv-3005",
+      "finalQuoteId": "fq-9005",
+      "amountDue": 578.00,
+      "createdOn": "2025-12-01",
+      "dueDate": "2025-12-11",
       "paid": false,
       "paymentRef": null
     }
@@ -241,6 +347,26 @@
       "planTier": "Premium",
       "maintenancePlanId": "plan-premium",
       "enrolledOn": "2023-04-02"
+    },
+    {
+      "id": "cust-004",
+      "name": "Robert Chen",
+      "primaryAddress": "1422 Oak Manor Dr, Houston, TX",
+      "email": "robert.chen@example.com",
+      "phone": "832-555-0288",
+      "planTier": "Basic",
+      "maintenancePlanId": "plan-basic",
+      "enrolledOn": "2024-06-15"
+    },
+    {
+      "id": "cust-005",
+      "name": "Lisa Rodriguez",
+      "primaryAddress": "78 Pine Valley Ct, Sugar Land, TX",
+      "email": "lisa.rodriguez@example.com",
+      "phone": "713-555-0392",
+      "planTier": null,
+      "maintenancePlanId": null,
+      "enrolledOn": null
     }
   ],
   "businessSettings": {

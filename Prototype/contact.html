@@ -24,47 +24,125 @@
         </div>
     </header>
 
+    <section class="section" style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); color: white; padding: 4rem 0;">
+        <div class="container" style="text-align: center;">
+            <h1 style="color: white; font-size: 2.5rem; margin-bottom: 1rem;">We're Here to Help</h1>
+            <p style="font-size: 1.15rem; opacity: 0.95; max-width: 700px; margin: 0 auto 2rem;">Whether you need a quote, emergency service, or want to enroll in our Comfort Club, reach out—we respond fast.</p>
+        </div>
+    </section>
+
     <section class="section">
         <div class="container">
-            <h1>Contact Us</h1>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-                <div style="background: white; padding: 2rem; border-radius: 8px;">
-                    <h2>Get in Touch</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+                <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); text-align: center;">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">📞</div>
+                    <h3 style="margin-bottom: 0.5rem;">Call Us</h3>
+                    <p style="font-size: 1.25rem; font-weight: 600; color: var(--primary, #1d4ed8); margin-bottom: 0.25rem;">(281) 555-5555</p>
+                    <p style="font-size: 0.9rem; color: #6b7280;">Mon–Sat: 8:00 AM – 6:00 PM</p>
+                </div>
+                <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); text-align: center;">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">✉️</div>
+                    <h3 style="margin-bottom: 0.5rem;">Email Us</h3>
+                    <p style="font-size: 1.1rem; font-weight: 600; color: var(--primary, #1d4ed8); margin-bottom: 0.25rem;">Anthony@asap-hvac.com</p>
+                    <p style="font-size: 0.9rem; color: #6b7280;">We respond within 2 hours</p>
+                </div>
+                <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); text-align: center;">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">💬</div>
+                    <h3 style="margin-bottom: 0.5rem;">Text Us</h3>
+                    <p style="font-size: 1.1rem; font-weight: 600; color: var(--primary, #1d4ed8); margin-bottom: 0.25rem;">(281) 555-5555</p>
+                    <p style="font-size: 0.9rem; color: #6b7280;">Quick questions? Text anytime</p>
+                </div>
+                <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); text-align: center;">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🗓️</div>
+                    <h3 style="margin-bottom: 0.5rem;">Online Booking</h3>
+                    <p style="font-size: 1.1rem; font-weight: 600; color: var(--primary, #1d4ed8); margin-bottom: 0.25rem;"><a href="quote.html" style="color: inherit; text-decoration: none;">Request Quote →</a></p>
+                    <p style="font-size: 0.9rem; color: #6b7280;">Get started in 2 minutes</p>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 2rem; margin-bottom: 3rem;">
+                <div style="background: white; padding: 2.5rem; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);">
+                    <h2 style="margin-bottom: 1.5rem;">Send Us a Message</h2>
                     <form id="contact-form">
                         <div class="form-group">
-                            <label>Name *</label>
-                            <input type="text" name="name" required>
+                            <label>Your Name *</label>
+                            <input type="text" name="name" required placeholder="John Doe">
                         </div>
                         <div class="form-group">
-                            <label>Phone *</label>
-                            <input type="tel" name="phone" required>
+                            <label>Phone Number *</label>
+                            <input type="tel" name="phone" required placeholder="(281) 555-1234">
                         </div>
                         <div class="form-group">
-                            <label>Email *</label>
-                            <input type="email" name="email" required>
+                            <label>Email Address *</label>
+                            <input type="email" name="email" required placeholder="john@example.com">
                         </div>
                         <div class="form-group">
-                            <label>Message</label>
-                            <textarea name="message"></textarea>
+                            <label>I'm interested in... *</label>
+                            <select name="requestType" required style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 1rem;">
+                                <option value="">-- Please select --</option>
+                                <option value="quote">Getting a quote for service/repair</option>
+                                <option value="appointment">Scheduling an appointment</option>
+                                <option value="enroll">Enrolling in a Comfort Club plan</option>
+                                <option value="emergency">Emergency service (call us!)</option>
+                                <option value="general">General question or feedback</option>
+                            </select>
                         </div>
-                        <button type="submit" class="btn btn-primary">Send Message</button>
+                        <div class="form-group">
+                            <label>Tell us more</label>
+                            <textarea name="message" rows="4" placeholder="Briefly describe your needs or question..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Send Message</button>
                     </form>
-                    <div id="contact-success" class="alert alert-success hidden">
-                        Thank you! We'll get back to you soon.
+                    <div id="contact-success" class="alert alert-success hidden" style="margin-top: 1rem; padding: 1rem; background: #d1fae5; color: #047857; border-radius: 6px;">
+                        ✓ Thank you! We'll get back to you within 2 hours.
                     </div>
                 </div>
-                <div style="background: white; padding: 2rem; border-radius: 8px;">
-                    <h2>Service Area</h2>
-                    <p><strong>Greater Houston Area</strong></p>
-                    <h3>Hours</h3>
-                    <p>Mon–Sat: 8:00 AM – 6:00 PM</p>
-                    <p><small>After-hours emergency available; Premium plan members: no surcharge</small></p>
-                    <br>
-                    <h3>Contact</h3>
-                    <p><strong>Phone:</strong> (281) 555-5555</p>
-                    <p><strong>Email:</strong> Anthony@asap-hvac.com</p>
-                    <p><small>(Placeholder contact – replace with official ASAP email at go-live)</small></p>
+                <div style="background: white; padding: 2.5rem; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);">
+                    <h2 style="margin-bottom: 1.5rem;">Service Area & Hours</h2>
+                    <div style="margin-bottom: 1.5rem;">
+                        <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">📍 Greater Houston Area</h3>
+                        <p style="color: #6b7280; font-size: 0.95rem;">We proudly serve Houston, Katy, Sugar Land, and surrounding communities.</p>
+                    </div>
+                    <div style="margin-bottom: 1.5rem;">
+                        <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">🕒 Business Hours</h3>
+                        <p style="font-weight: 600; margin-bottom: 0.25rem;">Monday – Saturday</p>
+                        <p style="color: #6b7280; font-size: 0.95rem;">8:00 AM – 6:00 PM</p>
+                        <p style="color: #6b7280; font-size: 0.85rem; margin-top: 0.5rem;"><em>After-hours emergency service available. Premium Comfort Club members: no surcharge.</em></p>
+                    </div>
+                    <div style="margin-bottom: 1.5rem;">
+                        <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">💡 What to Expect</h3>
+                        <ul style="color: #6b7280; font-size: 0.95rem; line-height: 1.7;">
+                            <li>Same-day or next-day appointments</li>
+                            <li>2-hour arrival windows (no all-day waits)</li>
+                            <li>Upfront pricing—no surprises</li>
+                            <li>Licensed, background-checked techs</li>
+                        </ul>
+                    </div>
                 </div>
+            </div>
+
+            <div style="background: white; padding: 2.5rem; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);">
+                <h2 style="margin-bottom: 1.5rem;">Frequently Asked Questions</h2>
+                <details style="margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #e5e7eb;">
+                    <summary style="font-weight: 600; cursor: pointer; padding: 0.5rem 0;">Do you offer emergency service?</summary>
+                    <p style="margin-top: 0.75rem; color: #6b7280; font-size: 0.95rem;">Yes! Call us anytime at (281) 555-5555. After-hours service is available with a surcharge (waived for Premium Comfort Club members).</p>
+                </details>
+                <details style="margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #e5e7eb;">
+                    <summary style="font-weight: 600; cursor: pointer; padding: 0.5rem 0;">How quickly can you schedule an appointment?</summary>
+                    <p style="margin-top: 0.75rem; color: #6b7280; font-size: 0.95rem;">Most appointments are scheduled same-day or next-day. We offer 2-hour arrival windows so you're not waiting around all day.</p>
+                </details>
+                <details style="margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #e5e7eb;">
+                    <summary style="font-weight: 600; cursor: pointer; padding: 0.5rem 0;">What's your service area?</summary>
+                    <p style="margin-top: 0.75rem; color: #6b7280; font-size: 0.95rem;">We serve the Greater Houston Area including Houston, Katy, Sugar Land, Cypress, Pearland, and surrounding communities. Not sure if we cover your area? Just call or text us!</p>
+                </details>
+                <details style="margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #e5e7eb;">
+                    <summary style="font-weight: 600; cursor: pointer; padding: 0.5rem 0;">How does your Comfort Club work?</summary>
+                    <p style="margin-top: 0.75rem; color: #6b7280; font-size: 0.95rem;">Our <a href="plans.html" style="color: var(--primary, #1d4ed8);">Comfort Club</a> offers annual maintenance plans with tune-ups, priority scheduling, and discounts on parts and repairs. Plans start at $169/year.</p>
+                </details>
+                <details style="margin-bottom: 1rem;">
+                    <summary style="font-weight: 600; cursor: pointer; padding: 0.5rem 0;">Do you provide free estimates?</summary>
+                    <p style="margin-top: 0.75rem; color: #6b7280; font-size: 0.95rem;">Yes! We provide free, no-obligation quotes for new installations and major repairs. Diagnostic service calls are $79–$109, which is applied toward approved repairs.</p>
+                </details>
             </div>
         </div>
     </section>
