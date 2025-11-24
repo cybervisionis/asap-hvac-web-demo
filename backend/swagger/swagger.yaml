@@ -1,0 +1,204 @@
+openapi: 3.1.0
+info:
+  title: ASAP HVAC Sample API
+  version: 0.1.0
+  description: |
+    Sample REST API for the ASAP HVAC web demo. Provides CRUD support for
+    customer records stored in a JSON data set, designed to be upgraded to
+    SQLite or SQL Server in future iterations.
+servers:
+  - url: http://localhost:4000
+    description: Local development server
+paths:
+  /api/customers:
+    get:
+      summary: List customers
+      tags: [Customers]
+      responses:
+        '200':
+          description: A collection of customers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Customer'
+    post:
+      summary: Create a new customer
+      tags: [Customers]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerInput'
+      responses:
+        '201':
+          description: Newly created customer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+  /api/customers/{id}:
+    parameters:
+      - $ref: '#/components/parameters/CustomerId'
+    get:
+      summary: Retrieve a customer
+      tags: [Customers]
+      responses:
+        '200':
+          description: Customer details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      summary: Replace a customer
+      tags: [Customers]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerInput'
+      responses:
+        '200':
+          description: Updated customer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      summary: Partially update a customer
+      tags: [Customers]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerPartial'
+      responses:
+        '200':
+          description: Updated customer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Delete a customer
+      tags: [Customers]
+      responses:
+        '204':
+          description: Customer deleted successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  parameters:
+    CustomerId:
+      name: id
+      in: path
+      required: true
+      description: Unique identifier for the customer
+      schema:
+        type: string
+  responses:
+    ValidationError:
+      description: Input validation failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  schemas:
+    Customer:
+      type: object
+      required:
+        - id
+        - name
+        - primaryAddress
+        - email
+        - phone
+      properties:
+        id:
+          type: string
+          example: cust-001
+        name:
+          type: string
+          example: Jane Smith
+        primaryAddress:
+          type: string
+          example: 123 Houston Ave, Houston, TX
+        email:
+          type: string
+          format: email
+          example: jane@example.com
+        phone:
+          type: string
+          example: 281-555-0110
+        planTier:
+          type: string
+          nullable: true
+          example: Premium
+    CustomerInput:
+      type: object
+      required:
+        - name
+        - primaryAddress
+        - email
+        - phone
+      properties:
+        name:
+          type: string
+        primaryAddress:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        planTier:
+          type: string
+          nullable: true
+    CustomerPartial:
+      type: object
+      properties:
+        name:
+          type: string
+        primaryAddress:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        planTier:
+          type: string
+          nullable: true
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: ValidationError
+        message:
+          type: string
+          example: Customer email must be unique.
+        details:
+          description: Optional error metadata

@@ -1,0 +1,230 @@
+{
+  "services": [
+    {
+      "id": "svc-diagnostic",
+      "name": "Diagnostic / Service Call",
+      "category": "repair",
+      "basePriceRange": "$79-$109",
+      "description": "On-site troubleshooting; fee applied to approved repair."
+    },
+    {
+      "id": "svc-tuneup",
+      "name": "Seasonal Tune-Up",
+      "category": "maintenance",
+      "basePriceRange": "$109-$149",
+      "description": "Performance inspection, coil cleaning, basic efficiency checks."
+    },
+    {
+      "id": "svc-install",
+      "name": "Central AC Install (3–4 ton)",
+      "category": "installation",
+      "basePriceRange": "$4800-$8200",
+      "description": "Load sizing, equipment install, basic warranty outline."
+    },
+    {
+      "id": "svc-duct-repair",
+      "name": "Duct Repair",
+      "category": "ductwork",
+      "basePriceRange": "$250-$650",
+      "description": "Minor repair sections; restore airflow."
+    },
+    {
+      "id": "svc-duct-replace",
+      "name": "Full Duct Replacement",
+      "category": "ductwork",
+      "basePriceRange": "$2800-$6500",
+      "description": "Whole-home replacement; materials & footage dependent."
+    },
+    {
+      "id": "svc-thermostat",
+      "name": "Smart Thermostat Upgrade",
+      "category": "upgrade",
+      "basePriceRange": "$249-$399",
+      "description": "Device + install + configuration."
+    },
+    {
+      "id": "svc-plumbing-assist",
+      "name": "Plumbing Assist (Condensate/Drain)",
+      "category": "plumbing",
+      "basePriceRange": "$150-$350",
+      "description": "Minor plumbing work related to HVAC systems."
+    }
+  ],
+  "maintenancePlans": [
+    {
+      "id": "plan-basic",
+      "planTier": "Basic",
+      "annualFee": 169,
+      "includedServices": [
+        "2 tune-ups"
+      ],
+      "partsDiscountPct": 5,
+      "extras": [
+        "Priority scheduling"
+      ]
+    },
+    {
+      "id": "plan-plus",
+      "planTier": "Plus",
+      "annualFee": 249,
+      "includedServices": [
+        "2 tune-ups",
+        "Condenser clean",
+        "Light duct check"
+      ],
+      "partsDiscountPct": 10,
+      "extras": [
+        "Next-day priority"
+      ]
+    },
+    {
+      "id": "plan-premium",
+      "planTier": "Premium",
+      "annualFee": 379,
+      "includedServices": [
+        "2 tune-ups",
+        "Condenser clean",
+        "Light duct check",
+        "IAQ assessment",
+        "Drain line flush"
+      ],
+      "partsDiscountPct": 15,
+      "extras": [
+        "No after-hours surcharge"
+      ]
+    }
+  ],
+  "quoteRequests": [
+    {
+      "id": "qr-1001",
+      "customerName": "Jane Smith",
+      "contactPhone": "281-555-0110",
+      "email": "jane@example.com",
+      "address": "123 Houston Ave, Houston, TX",
+      "serviceType": "repair",
+      "urgency": "normal",
+      "requestedDate": "2025-11-26",
+      "unitAgeYears": 8,
+      "symptoms": [
+        "No cooling",
+        "High energy bill"
+      ],
+      "notes": "System struggles afternoons.",
+      "status": "awaiting-scheduling"
+    }
+  ],
+  "appointments": [
+    {
+      "id": "appt-5001",
+      "quoteRequestId": "qr-1001",
+      "scheduledDate": "2025-11-27",
+      "window": "9am-11am",
+      "technician": "Anthony Anderson",
+      "status": "scheduled"
+    }
+  ],
+  "inspections": [
+    {
+      "id": "insp-7001",
+      "quoteRequestId": "qr-1001",
+      "technician": "Anthony Anderson",
+      "findings": [
+        {
+          "code": "low-refrigerant",
+          "description": "Low refrigerant level",
+          "severity": "moderate"
+        },
+        {
+          "code": "cap-worn",
+          "description": "Worn blower capacitor",
+          "severity": "high"
+        }
+      ],
+      "adjustments": [
+        {
+          "description": "Recharge refrigerant",
+          "cost": 180
+        },
+        {
+          "description": "Replace capacitor",
+          "cost": 120
+        }
+      ],
+      "recommendedServices": [
+        "Seasonal tune-up"
+      ]
+    }
+  ],
+  "finalQuotes": [
+    {
+      "id": "fq-9001",
+      "quoteRequestId": "qr-1001",
+      "baseEstimate": 250,
+      "adjustmentsTotal": 300,
+      "finalTotal": 550,
+      "expiresOn": "2025-12-05",
+      "status": "awaiting-approval"
+    }
+  ],
+  "invoices": [
+    {
+      "id": "inv-3001",
+      "finalQuoteId": "fq-9001",
+      "amountDue": 550,
+      "createdOn": "2025-11-24",
+      "dueDate": "2025-12-04",
+      "paid": false,
+      "paymentRef": null
+    }
+  ],
+  "payments": [],
+  "partsOrders": [
+    {
+      "id": "po-8001",
+      "finalQuoteId": "fq-9001",
+      "items": [
+        {
+          "partId": "prt-01",
+          "description": "Blower Capacitor",
+          "qty": 1,
+          "costEach": 85
+        },
+        {
+          "partId": "prt-02",
+          "description": "Refrigerant (R-410A) recharge kit",
+          "qty": 1,
+          "costEach": 120
+        }
+      ],
+      "totalCost": 205,
+      "status": "ordered",
+      "etaDate": "2025-11-30",
+      "notes": "Standard shipping; tech to confirm install window when received."
+    }
+  ],
+  "customers": [
+    {
+      "id": "cust-001",
+      "name": "Jane Smith",
+      "primaryAddress": "123 Houston Ave, Houston, TX",
+      "email": "jane@example.com",
+      "phone": "281-555-0110",
+      "planTier": "Premium"
+    },
+    {
+      "id": "cust-76d217ee-0ada-4908-8980-9802660ea0fc",
+      "name": "John Doe",
+      "primaryAddress": "456 Main St, Houston, TX",
+      "email": "john@example.com",
+      "phone": "281-555-0222",
+      "planTier": null
+    }
+  ],
+  "businessSettings": {
+    "cancellationWindowHours": 24,
+    "cancellationFee": 50,
+    "quoteExpiryDays": 14,
+    "serviceFeeRange": "$79-$109",
+    "schedulingWindow": "Mon–Sat 8:00-18:00"
+  }
+}
