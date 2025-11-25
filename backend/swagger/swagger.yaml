@@ -1,11 +1,11 @@
 openapi: 3.1.0
 info:
   title: ASAP HVAC Sample API
-  version: 0.1.0
+  version: 0.2.0
   description: |
     Sample REST API for the ASAP HVAC web demo. Provides CRUD support for
-    customer records stored in a JSON data set, designed to be upgraded to
-    SQLite or SQL Server in future iterations.
+    HVAC operational data with pagination, filtering, and validation via Zod
+    schemas. Designed to be upgraded to relational storage in future iterations.
 servers:
   - url: http://localhost:4000
     description: Local development server
@@ -14,15 +14,35 @@ paths:
     get:
       summary: List customers
       tags: [Customers]
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - name: planTier
+          in: query
+          description: Filter by assigned maintenance plan tier.
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+        - name: email
+          in: query
+          description: Filter by customer email address (case-insensitive match).
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
       responses:
         '200':
-          description: A collection of customers
+          description: A paginated collection of customers
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Customer'
+                $ref: '#/components/schemas/PaginatedCustomer'
     post:
       summary: Create a new customer
       tags: [Customers]
@@ -57,14 +77,15 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
     put:
-      summary: Replace a customer
+      summary: Update customer (idempotent)
+      description: Performs an idempotent update accepting any subset of customer fields.
       tags: [Customers]
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CustomerInput'
+              $ref: '#/components/schemas/CustomerUpdate'
       responses:
         '200':
           description: Updated customer
@@ -84,7 +105,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CustomerPartial'
+              $ref: '#/components/schemas/CustomerUpdate'
       responses:
         '200':
           description: Updated customer
@@ -104,13 +125,1173 @@ paths:
           description: Customer deleted successfully
         '404':
           $ref: '#/components/responses/NotFound'
+
+  /api/service-offerings:
+    get:
+      summary: List service offerings
+      tags: [Service offerings]
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - name: category
+          in: query
+          description: Filter by service category.
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+        - name: name
+          in: query
+          description: Filter by service name (case-insensitive match).
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+      responses:
+        '200':
+          description: Paginated list of service offerings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedServiceOffering'
+    post:
+      summary: Create a new service offering
+      tags: [Service offerings]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceOfferingInput'
+      responses:
+        '201':
+          description: Newly created service offering
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceOffering'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+  /api/service-offerings/{id}:
+    parameters:
+      - $ref: '#/components/parameters/ServiceOfferingId'
+    get:
+      summary: Retrieve a service offering
+      tags: [Service offerings]
+      responses:
+        '200':
+          description: Service offering details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceOffering'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      summary: Update service offering
+      tags: [Service offerings]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceOfferingUpdate'
+      responses:
+        '200':
+          description: Updated service offering
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceOffering'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      summary: Partially update a service offering
+      tags: [Service offerings]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceOfferingUpdate'
+      responses:
+        '200':
+          description: Updated service offering
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceOffering'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Delete a service offering
+      tags: [Service offerings]
+      responses:
+        '204':
+          description: Service offering deleted successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/maintenance-plans:
+    get:
+      summary: List maintenance plans
+      tags: [Maintenance plans]
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - name: planTier
+          in: query
+          description: Filter by plan tier label.
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+      responses:
+        '200':
+          description: Paginated list of maintenance plans
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMaintenancePlan'
+    post:
+      summary: Create a maintenance plan
+      tags: [Maintenance plans]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MaintenancePlanInput'
+      responses:
+        '201':
+          description: Newly created maintenance plan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaintenancePlan'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+  /api/maintenance-plans/{id}:
+    parameters:
+      - $ref: '#/components/parameters/MaintenancePlanId'
+    get:
+      summary: Retrieve a maintenance plan
+      tags: [Maintenance plans]
+      responses:
+        '200':
+          description: Maintenance plan details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaintenancePlan'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      summary: Update maintenance plan
+      tags: [Maintenance plans]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MaintenancePlanUpdate'
+      responses:
+        '200':
+          description: Updated maintenance plan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaintenancePlan'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      summary: Partially update a maintenance plan
+      tags: [Maintenance plans]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MaintenancePlanUpdate'
+      responses:
+        '200':
+          description: Updated maintenance plan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaintenancePlan'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Delete a maintenance plan
+      tags: [Maintenance plans]
+      responses:
+        '204':
+          description: Maintenance plan deleted successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/quote-requests:
+    get:
+      summary: List quote requests
+      tags: [Quote requests]
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - name: status
+          in: query
+          description: Filter by quote request status.
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/QuoteStatus'
+          style: form
+          explode: true
+        - name: urgency
+          in: query
+          description: Filter by urgency level.
+          schema:
+            type: array
+            items:
+              type: string
+              enum: [low, normal, high]
+          style: form
+          explode: true
+        - name: serviceType
+          in: query
+          description: Filter by requested service type.
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+        - name: customerName
+          in: query
+          description: Filter by customer name.
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+      responses:
+        '200':
+          description: Paginated list of quote requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedQuoteRequest'
+    post:
+      summary: Create a quote request
+      tags: [Quote requests]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuoteRequestInput'
+      responses:
+        '201':
+          description: Newly created quote request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteRequest'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+  /api/quote-requests/{id}:
+    parameters:
+      - $ref: '#/components/parameters/QuoteRequestId'
+    get:
+      summary: Retrieve a quote request
+      tags: [Quote requests]
+      responses:
+        '200':
+          description: Quote request details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      summary: Update quote request
+      tags: [Quote requests]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuoteRequestUpdate'
+      responses:
+        '200':
+          description: Updated quote request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteRequest'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      summary: Partially update a quote request
+      tags: [Quote requests]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuoteRequestUpdate'
+      responses:
+        '200':
+          description: Updated quote request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteRequest'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Delete a quote request
+      tags: [Quote requests]
+      responses:
+        '204':
+          description: Quote request deleted successfully
+        '400':
+          description: Quote request cannot be deleted when dependent records exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/appointments:
+    get:
+      summary: List appointments
+      tags: [Appointments]
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - name: status
+          in: query
+          description: Filter by appointment status.
+          schema:
+            type: array
+            items:
+              type: string
+              enum: [scheduled, completed, canceled]
+          style: form
+          explode: true
+        - name: technician
+          in: query
+          description: Filter by technician name.
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+        - name: quoteRequestId
+          in: query
+          description: Filter by quote request identifier.
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+      responses:
+        '200':
+          description: Paginated list of appointments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAppointment'
+    post:
+      summary: Create an appointment
+      tags: [Appointments]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentInput'
+      responses:
+        '201':
+          description: Newly created appointment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+  /api/appointments/{id}:
+    parameters:
+      - $ref: '#/components/parameters/AppointmentId'
+    get:
+      summary: Retrieve an appointment
+      tags: [Appointments]
+      responses:
+        '200':
+          description: Appointment details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      summary: Update an appointment
+      tags: [Appointments]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentUpdate'
+      responses:
+        '200':
+          description: Updated appointment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      summary: Partially update an appointment
+      tags: [Appointments]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentUpdate'
+      responses:
+        '200':
+          description: Updated appointment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Delete an appointment
+      tags: [Appointments]
+      responses:
+        '204':
+          description: Appointment deleted successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/inspections:
+    get:
+      summary: List inspections
+      tags: [Inspections]
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - name: quoteRequestId
+          in: query
+          description: Filter by quote request identifier.
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+        - name: technician
+          in: query
+          description: Filter by technician name.
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+      responses:
+        '200':
+          description: Paginated list of inspections
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedInspection'
+    post:
+      summary: Create an inspection
+      tags: [Inspections]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InspectionInput'
+      responses:
+        '201':
+          description: Newly created inspection
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inspection'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+  /api/inspections/{id}:
+    parameters:
+      - $ref: '#/components/parameters/InspectionId'
+    get:
+      summary: Retrieve an inspection
+      tags: [Inspections]
+      responses:
+        '200':
+          description: Inspection details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inspection'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      summary: Update an inspection
+      tags: [Inspections]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InspectionUpdate'
+      responses:
+        '200':
+          description: Updated inspection
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inspection'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      summary: Partially update an inspection
+      tags: [Inspections]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InspectionUpdate'
+      responses:
+        '200':
+          description: Updated inspection
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inspection'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Delete an inspection
+      tags: [Inspections]
+      responses:
+        '204':
+          description: Inspection deleted successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/final-quotes:
+    get:
+      summary: List final quotes
+      tags: [Final quotes]
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - name: quoteRequestId
+          in: query
+          description: Filter by quote request identifier.
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+        - name: status
+          in: query
+          description: Filter by quote decision status.
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/FinalQuoteStatus'
+          style: form
+          explode: true
+      responses:
+        '200':
+          description: Paginated list of final quotes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedFinalQuote'
+    post:
+      summary: Create a final quote
+      tags: [Final quotes]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinalQuoteInput'
+      responses:
+        '201':
+          description: Newly created final quote
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinalQuote'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+  /api/final-quotes/{id}:
+    parameters:
+      - $ref: '#/components/parameters/FinalQuoteId'
+    get:
+      summary: Retrieve a final quote
+      tags: [Final quotes]
+      responses:
+        '200':
+          description: Final quote details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinalQuote'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      summary: Update a final quote
+      tags: [Final quotes]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinalQuoteUpdate'
+      responses:
+        '200':
+          description: Updated final quote
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinalQuote'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      summary: Partially update a final quote
+      tags: [Final quotes]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinalQuoteUpdate'
+      responses:
+        '200':
+          description: Updated final quote
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinalQuote'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Delete a final quote
+      tags: [Final quotes]
+      responses:
+        '204':
+          description: Final quote deleted successfully
+        '400':
+          description: Final quote cannot be deleted while related invoices or parts orders exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/invoices:
+    get:
+      summary: List invoices
+      tags: [Invoices]
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - name: finalQuoteId
+          in: query
+          description: Filter by final quote identifier.
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+        - name: paid
+          in: query
+          description: Filter by invoice payment status.
+          schema:
+            type: array
+            items:
+              type: string
+              enum: ['true', 'false']
+          style: form
+          explode: true
+      responses:
+        '200':
+          description: Paginated list of invoices
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedInvoice'
+    post:
+      summary: Create an invoice
+      tags: [Invoices]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvoiceInput'
+      responses:
+        '201':
+          description: Newly created invoice
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+  /api/invoices/{id}:
+    parameters:
+      - $ref: '#/components/parameters/InvoiceId'
+    get:
+      summary: Retrieve an invoice
+      tags: [Invoices]
+      responses:
+        '200':
+          description: Invoice details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      summary: Update an invoice
+      tags: [Invoices]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvoiceUpdate'
+      responses:
+        '200':
+          description: Updated invoice
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      summary: Partially update an invoice
+      tags: [Invoices]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvoiceUpdate'
+      responses:
+        '200':
+          description: Updated invoice
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Delete an invoice
+      tags: [Invoices]
+      responses:
+        '204':
+          description: Invoice deleted successfully
+        '400':
+          description: Invoice cannot be deleted while related payments exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/payments:
+    get:
+      summary: List payments
+      tags: [Payments]
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - name: invoiceId
+          in: query
+          description: Filter by invoice identifier.
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+        - name: method
+          in: query
+          description: Filter by payment method label.
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+      responses:
+        '200':
+          description: Paginated list of payments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPayment'
+    post:
+      summary: Create a payment
+      tags: [Payments]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentInput'
+      responses:
+        '201':
+          description: Newly created payment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+  /api/payments/{id}:
+    parameters:
+      - $ref: '#/components/parameters/PaymentId'
+    get:
+      summary: Retrieve a payment
+      tags: [Payments]
+      responses:
+        '200':
+          description: Payment details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      summary: Update a payment
+      tags: [Payments]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentUpdate'
+      responses:
+        '200':
+          description: Updated payment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      summary: Partially update a payment
+      tags: [Payments]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentUpdate'
+      responses:
+        '200':
+          description: Updated payment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Delete a payment
+      tags: [Payments]
+      responses:
+        '204':
+          description: Payment deleted successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/parts-orders:
+    get:
+      summary: List parts orders
+      tags: [Parts orders]
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - name: finalQuoteId
+          in: query
+          description: Filter by final quote identifier.
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+        - name: status
+          in: query
+          description: Filter by parts order status.
+          schema:
+            type: array
+            items:
+              type: string
+              enum: [ordered, backordered, fulfilled, canceled]
+          style: form
+          explode: true
+      responses:
+        '200':
+          description: Paginated list of parts orders
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPartsOrder'
+    post:
+      summary: Create a parts order
+      tags: [Parts orders]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartsOrderInput'
+      responses:
+        '201':
+          description: Newly created parts order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartsOrder'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+  /api/parts-orders/{id}:
+    parameters:
+      - $ref: '#/components/parameters/PartsOrderId'
+    get:
+      summary: Retrieve a parts order
+      tags: [Parts orders]
+      responses:
+        '200':
+          description: Parts order details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartsOrder'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      summary: Update a parts order
+      tags: [Parts orders]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartsOrderUpdate'
+      responses:
+        '200':
+          description: Updated parts order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartsOrder'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      summary: Partially update a parts order
+      tags: [Parts orders]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartsOrderUpdate'
+      responses:
+        '200':
+          description: Updated parts order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartsOrder'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Delete a parts order
+      tags: [Parts orders]
+      responses:
+        '204':
+          description: Parts order deleted successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+
 components:
   parameters:
+    PageParam:
+      name: page
+      in: query
+      description: Page number (1-based indexing).
+      schema:
+        type: integer
+        minimum: 1
+    LimitParam:
+      name: limit
+      in: query
+      description: Number of records per page (max 100).
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+    SortParam:
+      name: sort
+      in: query
+      description: Sort expression in the format `<field>[:asc|desc]`.
+      schema:
+        type: string
     CustomerId:
       name: id
       in: path
       required: true
       description: Unique identifier for the customer
+      schema:
+        type: string
+    ServiceOfferingId:
+      name: id
+      in: path
+      required: true
+      description: Unique identifier for the service offering
+      schema:
+        type: string
+    MaintenancePlanId:
+      name: id
+      in: path
+      required: true
+      description: Unique identifier for the maintenance plan
+      schema:
+        type: string
+    QuoteRequestId:
+      name: id
+      in: path
+      required: true
+      description: Unique identifier for the quote request
+      schema:
+        type: string
+    AppointmentId:
+      name: id
+      in: path
+      required: true
+      description: Unique identifier for the appointment
+      schema:
+        type: string
+    InspectionId:
+      name: id
+      in: path
+      required: true
+      description: Unique identifier for the inspection
+      schema:
+        type: string
+    FinalQuoteId:
+      name: id
+      in: path
+      required: true
+      description: Unique identifier for the final quote
+      schema:
+        type: string
+    InvoiceId:
+      name: id
+      in: path
+      required: true
+      description: Unique identifier for the invoice
+      schema:
+        type: string
+    PaymentId:
+      name: id
+      in: path
+      required: true
+      description: Unique identifier for the payment
+      schema:
+        type: string
+    PartsOrderId:
+      name: id
+      in: path
+      required: true
+      description: Unique identifier for the parts order
       schema:
         type: string
   responses:
@@ -127,6 +1308,44 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
   schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: ValidationError
+        message:
+          type: string
+          example: Customer email must be unique.
+        details:
+          description: Optional error metadata
+          nullable: true
+    ListMeta:
+      type: object
+      required: [total, page, limit, hasNextPage]
+      properties:
+        total:
+          type: integer
+          example: 45
+        page:
+          type: integer
+          example: 1
+        limit:
+          type: integer
+          example: 25
+        hasNextPage:
+          type: boolean
+          example: true
+    PaginatedCustomer:
+      type: object
+      required: [items, meta]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Customer'
+        meta:
+          $ref: '#/components/schemas/ListMeta'
     Customer:
       type: object
       required:
@@ -176,8 +1395,9 @@ components:
         planTier:
           type: string
           nullable: true
-    CustomerPartial:
+    CustomerUpdate:
       type: object
+      description: At least one property is required when updating an existing customer.
       properties:
         name:
           type: string
@@ -191,14 +1411,574 @@ components:
         planTier:
           type: string
           nullable: true
-    ErrorResponse:
+
+    PaginatedServiceOffering:
       type: object
+      required: [items, meta]
       properties:
-        error:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceOffering'
+        meta:
+          $ref: '#/components/schemas/ListMeta'
+    ServiceOffering:
+      type: object
+      required: [id, name, category, basePriceRange, description]
+      properties:
+        id:
           type: string
-          example: ValidationError
-        message:
+          example: svc-diagnostic
+        name:
           type: string
-          example: Customer email must be unique.
-        details:
-          description: Optional error metadata
+        category:
+          type: string
+        basePriceRange:
+          type: string
+        description:
+          type: string
+    ServiceOfferingInput:
+      type: object
+      required: [name, category, basePriceRange, description]
+      properties:
+        id:
+          type: string
+          description: Optional custom identifier. If omitted, an id is generated.
+        name:
+          type: string
+        category:
+          type: string
+        basePriceRange:
+          type: string
+        description:
+          type: string
+    ServiceOfferingUpdate:
+      allOf:
+        - $ref: '#/components/schemas/ServiceOfferingInput'
+
+    PaginatedMaintenancePlan:
+      type: object
+      required: [items, meta]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/MaintenancePlan'
+        meta:
+          $ref: '#/components/schemas/ListMeta'
+    MaintenancePlan:
+      type: object
+      required: [id, planTier, annualFee, includedServices, partsDiscountPct, extras]
+      properties:
+        id:
+          type: string
+        planTier:
+          type: string
+        annualFee:
+          type: number
+        includedServices:
+          type: array
+          items:
+            type: string
+        partsDiscountPct:
+          type: integer
+          minimum: 0
+          maximum: 100
+        extras:
+          type: array
+          items:
+            type: string
+    MaintenancePlanInput:
+      type: object
+      required: [planTier, annualFee, includedServices, partsDiscountPct]
+      properties:
+        id:
+          type: string
+        planTier:
+          type: string
+        annualFee:
+          type: number
+        includedServices:
+          type: array
+          items:
+            type: string
+        partsDiscountPct:
+          type: integer
+        extras:
+          type: array
+          items:
+            type: string
+    MaintenancePlanUpdate:
+      allOf:
+        - $ref: '#/components/schemas/MaintenancePlanInput'
+
+    QuoteStatus:
+      type: string
+      enum: [new, awaiting-scheduling, scheduled, inspection-complete, awaiting-approval, approved, declined]
+    PaginatedQuoteRequest:
+      type: object
+      required: [items, meta]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteRequest'
+        meta:
+          $ref: '#/components/schemas/ListMeta'
+    QuoteRequest:
+      type: object
+      required:
+        - id
+        - customerName
+        - contactPhone
+        - email
+        - address
+        - serviceType
+        - urgency
+        - requestedDate
+        - symptoms
+        - status
+      properties:
+        id:
+          type: string
+        customerName:
+          type: string
+        contactPhone:
+          type: string
+        email:
+          type: string
+          format: email
+        address:
+          type: string
+        serviceType:
+          type: string
+        urgency:
+          type: string
+          enum: [low, normal, high]
+        requestedDate:
+          type: string
+          format: date
+        unitAgeYears:
+          type: number
+          nullable: true
+        symptoms:
+          type: array
+          items:
+            type: string
+        notes:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/QuoteStatus'
+    QuoteRequestInput:
+      type: object
+      required:
+        - customerName
+        - contactPhone
+        - email
+        - address
+        - serviceType
+        - requestedDate
+      properties:
+        id:
+          type: string
+        customerName:
+          type: string
+        contactPhone:
+          type: string
+        email:
+          type: string
+          format: email
+        address:
+          type: string
+        serviceType:
+          type: string
+        urgency:
+          type: string
+          enum: [low, normal, high]
+        requestedDate:
+          type: string
+          format: date
+        unitAgeYears:
+          type: number
+          nullable: true
+        symptoms:
+          type: array
+          items:
+            type: string
+        notes:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/QuoteStatus'
+    QuoteRequestUpdate:
+      allOf:
+        - $ref: '#/components/schemas/QuoteRequestInput'
+
+    PaginatedAppointment:
+      type: object
+      required: [items, meta]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Appointment'
+        meta:
+          $ref: '#/components/schemas/ListMeta'
+    Appointment:
+      type: object
+      required: [id, quoteRequestId, scheduledDate, window, technician, status]
+      properties:
+        id:
+          type: string
+        quoteRequestId:
+          type: string
+        scheduledDate:
+          type: string
+          format: date
+        window:
+          type: string
+        technician:
+          type: string
+        status:
+          type: string
+          enum: [scheduled, completed, canceled]
+    AppointmentInput:
+      type: object
+      required: [quoteRequestId, scheduledDate, window, technician, status]
+      properties:
+        id:
+          type: string
+        quoteRequestId:
+          type: string
+        scheduledDate:
+          type: string
+          format: date
+        window:
+          type: string
+        technician:
+          type: string
+        status:
+          type: string
+          enum: [scheduled, completed, canceled]
+    AppointmentUpdate:
+      allOf:
+        - $ref: '#/components/schemas/AppointmentInput'
+
+    PaginatedInspection:
+      type: object
+      required: [items, meta]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Inspection'
+        meta:
+          $ref: '#/components/schemas/ListMeta'
+    Inspection:
+      type: object
+      required: [id, quoteRequestId, technician, findings, adjustments, recommendedServices]
+      properties:
+        id:
+          type: string
+        quoteRequestId:
+          type: string
+        technician:
+          type: string
+        findings:
+          type: array
+          items:
+            $ref: '#/components/schemas/InspectionFinding'
+        adjustments:
+          type: array
+          items:
+            $ref: '#/components/schemas/InspectionAdjustment'
+        recommendedServices:
+          type: array
+          items:
+            type: string
+    InspectionFinding:
+      type: object
+      required: [code, description, severity]
+      properties:
+        code:
+          type: string
+        description:
+          type: string
+        severity:
+          type: string
+          enum: [low, moderate, high]
+    InspectionAdjustment:
+      type: object
+      required: [description, cost]
+      properties:
+        description:
+          type: string
+        cost:
+          type: number
+    InspectionInput:
+      type: object
+      required: [quoteRequestId, technician, findings]
+      properties:
+        id:
+          type: string
+        quoteRequestId:
+          type: string
+        technician:
+          type: string
+        findings:
+          type: array
+          items:
+            $ref: '#/components/schemas/InspectionFinding'
+        adjustments:
+          type: array
+          items:
+            $ref: '#/components/schemas/InspectionAdjustment'
+        recommendedServices:
+          type: array
+          items:
+            type: string
+    InspectionUpdate:
+      allOf:
+        - $ref: '#/components/schemas/InspectionInput'
+
+    FinalQuoteStatus:
+      type: string
+      enum: [draft, awaiting-approval, approved, expired, declined]
+    PaginatedFinalQuote:
+      type: object
+      required: [items, meta]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/FinalQuote'
+        meta:
+          $ref: '#/components/schemas/ListMeta'
+    FinalQuote:
+      type: object
+      required: [id, quoteRequestId, baseEstimate, adjustmentsTotal, finalTotal, expiresOn, status]
+      properties:
+        id:
+          type: string
+        quoteRequestId:
+          type: string
+        baseEstimate:
+          type: number
+        adjustmentsTotal:
+          type: number
+        finalTotal:
+          type: number
+        expiresOn:
+          type: string
+          format: date
+        status:
+          $ref: '#/components/schemas/FinalQuoteStatus'
+    FinalQuoteInput:
+      type: object
+      required: [quoteRequestId, baseEstimate, adjustmentsTotal, finalTotal, expiresOn, status]
+      properties:
+        id:
+          type: string
+        quoteRequestId:
+          type: string
+        baseEstimate:
+          type: number
+        adjustmentsTotal:
+          type: number
+        finalTotal:
+          type: number
+        expiresOn:
+          type: string
+          format: date
+        status:
+          $ref: '#/components/schemas/FinalQuoteStatus'
+    FinalQuoteUpdate:
+      allOf:
+        - $ref: '#/components/schemas/FinalQuoteInput'
+
+    PaginatedInvoice:
+      type: object
+      required: [items, meta]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Invoice'
+        meta:
+          $ref: '#/components/schemas/ListMeta'
+    Invoice:
+      type: object
+      required: [id, finalQuoteId, amountDue, createdOn, dueDate, paid]
+      properties:
+        id:
+          type: string
+        finalQuoteId:
+          type: string
+        amountDue:
+          type: number
+        createdOn:
+          type: string
+          format: date
+        dueDate:
+          type: string
+          format: date
+        paid:
+          type: boolean
+        paymentRef:
+          type: string
+          nullable: true
+    InvoiceInput:
+      type: object
+      required: [finalQuoteId, amountDue, createdOn, dueDate, paid]
+      properties:
+        id:
+          type: string
+        finalQuoteId:
+          type: string
+        amountDue:
+          type: number
+        createdOn:
+          type: string
+          format: date
+        dueDate:
+          type: string
+          format: date
+        paid:
+          type: boolean
+        paymentRef:
+          type: string
+          nullable: true
+    InvoiceUpdate:
+      allOf:
+        - $ref: '#/components/schemas/InvoiceInput'
+
+    PaginatedPayment:
+      type: object
+      required: [items, meta]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Payment'
+        meta:
+          $ref: '#/components/schemas/ListMeta'
+    Payment:
+      type: object
+      required: [id, invoiceId, amount, paidOn, method]
+      properties:
+        id:
+          type: string
+        invoiceId:
+          type: string
+        amount:
+          type: number
+        paidOn:
+          type: string
+          format: date
+        method:
+          type: string
+        reference:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+    PaymentInput:
+      type: object
+      required: [invoiceId, amount, paidOn, method]
+      properties:
+        id:
+          type: string
+        invoiceId:
+          type: string
+        amount:
+          type: number
+        paidOn:
+          type: string
+          format: date
+        method:
+          type: string
+        reference:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+    PaymentUpdate:
+      allOf:
+        - $ref: '#/components/schemas/PaymentInput'
+
+    PaginatedPartsOrder:
+      type: object
+      required: [items, meta]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PartsOrder'
+        meta:
+          $ref: '#/components/schemas/ListMeta'
+    PartsOrder:
+      type: object
+      required: [id, finalQuoteId, items, totalCost, status]
+      properties:
+        id:
+          type: string
+        finalQuoteId:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PartsOrderItem'
+        totalCost:
+          type: number
+        status:
+          type: string
+          enum: [ordered, backordered, fulfilled, canceled]
+        etaDate:
+          type: string
+          format: date
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+    PartsOrderItem:
+      type: object
+      required: [partId, description, qty, costEach]
+      properties:
+        partId:
+          type: string
+        description:
+          type: string
+        qty:
+          type: integer
+        costEach:
+          type: number
+    PartsOrderInput:
+      type: object
+      required: [finalQuoteId, items, totalCost, status]
+      properties:
+        id:
+          type: string
+        finalQuoteId:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PartsOrderItem'
+        totalCost:
+          type: number
+        status:
+          type: string
+          enum: [ordered, backordered, fulfilled, canceled]
+        etaDate:
+          type: string
+          format: date
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+    PartsOrderUpdate:
+      allOf:
+        - $ref: '#/components/schemas/PartsOrderInput'

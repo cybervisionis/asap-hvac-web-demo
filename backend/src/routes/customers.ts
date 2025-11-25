@@ -1,4 +1,4 @@
-import express from 'express';
+import { Router } from 'express';
 import {
   listCustomers,
   getCustomerById,
@@ -6,12 +6,13 @@ import {
   updateCustomer,
   deleteCustomer
 } from '../services/customer-service.js';
+import { RawQuery } from '../utils/list.js';
 
-const router = express.Router();
+const router = Router();
 
 router.get('/', async (req, res, next) => {
   try {
-    const customers = await listCustomers();
+    const customers = await listCustomers(req.query as RawQuery);
     res.json(customers);
   } catch (error) {
     next(error);
