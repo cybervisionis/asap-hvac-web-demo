@@ -20,6 +20,24 @@ const listOptions: ListQueryOptions = {
   defaultSortOrder: 'desc'
 };
 
+const appointmentRelationshipOptions: ListQueryOptions = {
+  filterable: ['status', 'technician'],
+  sortable: ['scheduledDate', 'technician', 'status'],
+  defaultSort: 'scheduledDate'
+};
+
+const inspectionRelationshipOptions: ListQueryOptions = {
+  filterable: ['technician'],
+  sortable: ['technician', 'id'],
+  defaultSort: 'technician'
+};
+
+const finalQuoteRelationshipOptions: ListQueryOptions = {
+  filterable: ['status'],
+  sortable: ['expiresOn', 'status', 'finalTotal'],
+  defaultSort: 'expiresOn'
+};
+
 async function readQuoteRequests(): Promise<QuoteRequest[]> {
   return getCollection(COLLECTION) as Promise<QuoteRequest[]>;
 }
@@ -39,6 +57,39 @@ export async function getQuoteRequestById(id: string): Promise<QuoteRequest> {
   }
 
   return quoteRequest;
+}
+
+export async function listAppointmentsForQuoteRequest(
+  quoteRequestId: string,
+  rawQuery: RawQuery
+): Promise<ListResult<Appointment>> {
+  await getQuoteRequestById(quoteRequestId);
+  const appointments = await getCollection('appointments') as Appointment[];
+  const query = parseListQuery(rawQuery, appointmentRelationshipOptions);
+  const filtered = appointments.filter((entry) => entry.quoteRequestId === quoteRequestId);
+  return applyListQuery(filtered, query);
+}
+
+export async function listInspectionsForQuoteRequest(
+  quoteRequestId: string,
+  rawQuery: RawQuery
+): Promise<ListResult<Inspection>> {
+  await getQuoteRequestById(quoteRequestId);
+  const inspections = await getCollection('inspections') as Inspection[];
+  const query = parseListQuery(rawQuery, inspectionRelationshipOptions);
+  const filtered = inspections.filter((entry) => entry.quoteRequestId === quoteRequestId);
+  return applyListQuery(filtered, query);
+}
+
+export async function listFinalQuotesForQuoteRequest(
+  quoteRequestId: string,
+  rawQuery: RawQuery
+): Promise<ListResult<FinalQuote>> {
+  await getQuoteRequestById(quoteRequestId);
+  const finalQuotes = await getCollection('finalQuotes') as FinalQuote[];
+  const query = parseListQuery(rawQuery, finalQuoteRelationshipOptions);
+  const filtered = finalQuotes.filter((entry) => entry.quoteRequestId === quoteRequestId);
+  return applyListQuery(filtered, query);
 }
 
 export async function createQuoteRequest(payload: unknown): Promise<QuoteRequest> {

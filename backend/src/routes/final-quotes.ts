@@ -4,6 +4,8 @@ import {
   deleteFinalQuote,
   getFinalQuoteById,
   listFinalQuotes,
+  listInvoicesForFinalQuote,
+  listPartsOrdersForFinalQuote,
   updateFinalQuote
 } from '../services/final-quote-service.js';
 import { RawQuery } from '../utils/list.js';
@@ -13,6 +15,24 @@ const router = Router();
 router.get('/', async (req, res, next) => {
   try {
     const result = await listFinalQuotes(req.query as RawQuery);
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/:id/invoices', async (req, res, next) => {
+  try {
+    const result = await listInvoicesForFinalQuote(req.params.id, req.query as RawQuery);
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/:id/parts-orders', async (req, res, next) => {
+  try {
+    const result = await listPartsOrdersForFinalQuote(req.params.id, req.query as RawQuery);
     res.json(result);
   } catch (error) {
     next(error);

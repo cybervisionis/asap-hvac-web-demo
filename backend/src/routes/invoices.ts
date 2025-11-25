@@ -4,6 +4,7 @@ import {
   deleteInvoice,
   getInvoiceById,
   listInvoices,
+  listPaymentsForInvoice,
   updateInvoice
 } from '../services/invoice-service.js';
 import { RawQuery } from '../utils/list.js';
@@ -13,6 +14,15 @@ const router = Router();
 router.get('/', async (req, res, next) => {
   try {
     const result = await listInvoices(req.query as RawQuery);
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/:id/payments', async (req, res, next) => {
+  try {
+    const result = await listPaymentsForInvoice(req.params.id, req.query as RawQuery);
     res.json(result);
   } catch (error) {
     next(error);

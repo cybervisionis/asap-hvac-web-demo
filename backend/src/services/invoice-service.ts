@@ -13,6 +13,12 @@ const listOptions: ListQueryOptions = {
   defaultSort: 'dueDate'
 };
 
+const paymentRelationshipOptions: ListQueryOptions = {
+  filterable: ['method'],
+  sortable: ['paidOn', 'amount', 'method'],
+  defaultSort: 'paidOn'
+};
+
 async function readInvoices(): Promise<Invoice[]> {
   return getCollection(COLLECTION) as Promise<Invoice[]>;
 }
@@ -51,6 +57,17 @@ export async function getInvoiceById(id: string): Promise<Invoice> {
   }
 
   return invoice;
+}
+
+export async function listPaymentsForInvoice(
+  invoiceId: string,
+  rawQuery: RawQuery
+): Promise<ListResult<Payment>> {
+  await getInvoiceById(invoiceId);
+  const payments = await getCollection('payments') as Payment[];
+  const query = parseListQuery(rawQuery, paymentRelationshipOptions);
+  const filtered = payments.filter((entry) => entry.invoiceId === invoiceId);
+  return applyListQuery(filtered, query);
 }
 
 export async function createInvoice(payload: unknown): Promise<Invoice> {

@@ -19,6 +19,18 @@ const listOptions: ListQueryOptions = {
   defaultSort: 'expiresOn'
 };
 
+const invoiceRelationshipOptions: ListQueryOptions = {
+  filterable: ['paid'],
+  sortable: ['dueDate', 'amountDue', 'paid'],
+  defaultSort: 'dueDate'
+};
+
+const partsOrderRelationshipOptions: ListQueryOptions = {
+  filterable: ['status'],
+  sortable: ['status', 'totalCost', 'etaDate'],
+  defaultSort: 'status'
+};
+
 async function readFinalQuotes(): Promise<FinalQuote[]> {
   return getCollection(COLLECTION) as Promise<FinalQuote[]>;
 }
@@ -55,6 +67,28 @@ export async function getFinalQuoteById(id: string): Promise<FinalQuote> {
   }
 
   return finalQuote;
+}
+
+export async function listInvoicesForFinalQuote(
+  finalQuoteId: string,
+  rawQuery: RawQuery
+): Promise<ListResult<Invoice>> {
+  await getFinalQuoteById(finalQuoteId);
+  const invoices = await getCollection('invoices') as Invoice[];
+  const query = parseListQuery(rawQuery, invoiceRelationshipOptions);
+  const filtered = invoices.filter((entry) => entry.finalQuoteId === finalQuoteId);
+  return applyListQuery(filtered, query);
+}
+
+export async function listPartsOrdersForFinalQuote(
+  finalQuoteId: string,
+  rawQuery: RawQuery
+): Promise<ListResult<PartsOrder>> {
+  await getFinalQuoteById(finalQuoteId);
+  const partsOrders = await getCollection('partsOrders') as PartsOrder[];
+  const query = parseListQuery(rawQuery, partsOrderRelationshipOptions);
+  const filtered = partsOrders.filter((entry) => entry.finalQuoteId === finalQuoteId);
+  return applyListQuery(filtered, query);
 }
 
 export async function createFinalQuote(payload: unknown): Promise<FinalQuote> {

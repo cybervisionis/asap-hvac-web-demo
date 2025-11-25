@@ -3,6 +3,9 @@ import {
   createQuoteRequest,
   deleteQuoteRequest,
   getQuoteRequestById,
+  listAppointmentsForQuoteRequest,
+  listFinalQuotesForQuoteRequest,
+  listInspectionsForQuoteRequest,
   listQuoteRequests,
   updateQuoteRequest
 } from '../services/quote-request-service.js';
@@ -13,6 +16,33 @@ const router = Router();
 router.get('/', async (req, res, next) => {
   try {
     const result = await listQuoteRequests(req.query as RawQuery);
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/:id/appointments', async (req, res, next) => {
+  try {
+    const result = await listAppointmentsForQuoteRequest(req.params.id, req.query as RawQuery);
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/:id/inspections', async (req, res, next) => {
+  try {
+    const result = await listInspectionsForQuoteRequest(req.params.id, req.query as RawQuery);
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/:id/final-quotes', async (req, res, next) => {
+  try {
+    const result = await listFinalQuotesForQuoteRequest(req.params.id, req.query as RawQuery);
     res.json(result);
   } catch (error) {
     next(error);
