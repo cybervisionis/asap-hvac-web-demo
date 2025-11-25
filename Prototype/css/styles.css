@@ -64,6 +64,50 @@ header .container {
   padding: 1rem;
 }
 
+.mobile-menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  color: var(--neutral-dark);
+}
+
+@media (max-width: 768px) {
+  .mobile-menu-toggle {
+    display: block;
+  }
+  
+  nav {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    display: none;
+  }
+  
+  nav.is-open {
+    display: block;
+  }
+  
+  nav ul {
+    flex-direction: column;
+    gap: 0;
+  }
+  
+  nav li {
+    border-bottom: 1px solid var(--neutral-light);
+  }
+  
+  nav a {
+    display: block;
+    padding: 1rem;
+  }
+}
+
 .logo,
 .site-logo {
   display: inline-flex;
@@ -232,6 +276,7 @@ nav a:hover {
   background-position: center;
   margin-bottom: 1.25rem;
   position: relative;
+  z-index: 1;
 }
 
 .service-card__media::after {
@@ -333,6 +378,7 @@ nav a:hover {
   letter-spacing: 0.5px;
   padding: 0.3rem 0.6rem;
   border-radius: 999px;
+  z-index: 10;
 }
 
 .plan-grid {
