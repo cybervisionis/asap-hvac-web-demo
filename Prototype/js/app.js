@@ -3,6 +3,9 @@
 let appData = {};
 const PIPELINE_STATE_KEY = 'asapPipelineState';
 const PIPELINE_HISTORY_KEY = 'asapPipelineHistory';
+const PIPELINE_FINAL_QUOTES_KEY = 'asapFinalQuotes';
+const PIPELINE_INVOICES_KEY = 'asapInvoices';
+const PIPELINE_CUSTOMERS_KEY = 'asapCustomers';
 
 const serviceVisuals = {
     'svc-diagnostic': {
@@ -32,7 +35,7 @@ const serviceVisuals = {
     },
     'svc-thermostat': {
         tag: 'SMART UPGRADE',
-        image: 'https://images.pexels.com/photos/3811584/pexels-photo-3811584.jpeg?auto=compress&cs=tinysrgb&w=1600',
+        image: 'https://images.pexels.com/photos/8291747/pexels-photo-8291747.jpeg?auto=compress&cs=tinysrgb&w=1600',
         highlights: ['Device + install bundle', 'Wi-Fi + app setup', 'Usage coaching for savings']
     },
     'svc-plumbing-assist': {
@@ -71,15 +74,31 @@ function buildServiceCardMarkup(service, { compact = false } = {}) {
 
 // Load data
 async function loadData() {
-    try {
-        const response = await fetch('data/data.json');
-        appData = await response.json();
-        console.log('Data loaded:', appData);
+    if (appData.__loaded) {
         return appData;
-    } catch (error) {
-        console.error('Error loading data:', error);
-        return null;
     }
+    const candidatePaths = ['data/data.json', '../data/data.json', './data/data.json'];
+    let fetched = null;
+    for (const path of candidatePaths) {
+        try {
+            const response = await fetch(path);
+            if (response.ok) {
+                fetched = await response.json();
+                break;
+            }
+        } catch (error) {
+            console.warn(`Failed to load data from ${path}`, error);
+        }
+    }
+    if (!fetched) {
+        console.error('Error loading data: no sources resolved');
+        fetched = {};
+    }
+    appData = fetched;
+    mergePersistedCollections();
+    appData.__loaded = true;
+    console.log('Data loaded:', appData);
+    return appData;
 }
 
 // Render services on home page
@@ -173,6 +192,9 @@ function promoteManualQuote(quoteRequestId) {
     if (!appData.customers.find(c => c.id === customer.id)) {
         appData.customers.push(customer);
     }
+    persistEntity(PIPELINE_FINAL_QUOTES_KEY, finalQuote);
+    persistEntity(PIPELINE_INVOICES_KEY, invoice);
+    persistEntity(PIPELINE_CUSTOMERS_KEY, customer);
     updateQuoteStage(finalQuoteId, 'awaiting-approval', { customerName: match.customerName, label: `Promoted ${match.customerName} from web submission` });
     return { finalQuote, invoice, customer };
 }
@@ -289,6 +311,40 @@ function getQuoteStage(finalQuoteId, fallback) {
 function getInvoiceStage(invoiceId, fallback) {
     const state = getPipelineState();
     return state.invoices[invoiceId]?.status || (fallback ? (fallback.paid ? 'paid' : 'sent') : 'draft');
+}
+
+function mergePersistedCollections() {
+    const ensureArray = (value) => Array.isArray(value) ? value : [];
+    const merge = (base, additions) => {
+        const seen = new Set((base || []).map(item => item.id));
+        additions.forEach(item => {
+            if (item && item.id && !seen.has(item.id)) {
+                base.push(item);
+                seen.add(item.id);
+            }
+        });
+        return base;
+    };
+    appData.finalQuotes = merge(appData.finalQuotes || [], ensureArray(loadPersistedCollection(PIPELINE_FINAL_QUOTES_KEY)));
+    appData.invoices = merge(appData.invoices || [], ensureArray(loadPersistedCollection(PIPELINE_INVOICES_KEY)));
+    appData.customers = merge(appData.customers || [], ensureArray(loadPersistedCollection(PIPELINE_CUSTOMERS_KEY)));
+}
+
+function loadPersistedCollection(key) {
+    try {
+        return JSON.parse(localStorage.getItem(key) || '[]');
+    } catch (error) {
+        console.warn(`Failed to parse collection for ${key}`, error);
+        localStorage.removeItem(key);
+        return [];
+    }
+}
+
+function persistEntity(key, entity) {
+    if (!entity || !entity.id) return;
+    const collection = loadPersistedCollection(key).filter(item => item.id !== entity.id);
+    collection.push(entity);
+    localStorage.setItem(key, JSON.stringify(collection));
 }
 
 window.dashboardHelpers = {

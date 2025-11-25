@@ -371,14 +371,15 @@ nav a:hover {
   position: absolute;
   top: 12px;
   left: 14px;
-  background: rgba(255,255,255,0.18);
+  background: rgba(10, 77, 140, 0.92);
   color: #fff;
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.5px;
-  padding: 0.3rem 0.6rem;
+  padding: 0.35rem 0.7rem;
   border-radius: 999px;
   z-index: 10;
+  box-shadow: 0 4px 10px -6px rgba(10, 77, 140, 0.8);
 }
 
 .plan-grid {
@@ -553,6 +554,16 @@ footer a {
   margin-left: 0.5rem;
 }
 
+.about-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 3rem;
+}
+
+.about-grid.auto-fit {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
 @media (max-width: 768px) {
   nav ul {
     flex-direction: column;
@@ -568,6 +579,10 @@ footer a {
   }
   
   .card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-grid {
     grid-template-columns: 1fr;
   }
 }
